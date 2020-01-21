@@ -1,0 +1,38 @@
+<body>
+  <iframe id="editor" src='https://wenyan-ide.netlify.com/embed?autorun&title=%E5%95%8F%E5%A4%A9%E5%9C%B0%E5%A5%BD%E5%9C%A8&code=%E5%90%BE%E6%9C%89%E4%B8%80%E8%A8%80%E3%80%82%E6%9B%B0%E3%80%8C%E3%80%8C%E5%95%8F%E5%A4%A9%E5%9C%B0%E5%A5%BD%E5%9C%A8%E3%80%82%E3%80%8D%E3%80%8D%E3%80%82%E6%9B%B8%E4%B9%8B%E3%80%82' height="300" width="500"></iframe>
+
+  <br>
+  <br>
+  <button id='dark'>Toggle Dark</button>
+  <button id='run'>Run</button>
+  <button id='title'>Change Title</button>
+  <script>
+    const editor = document.getElementById('editor')
+    let dark = false
+
+    window.addEventListener('message', (e) => {
+      if (e.data.source === 'wenyan-ide') {
+        if (e.data.action === 'change') {
+          console.log('Code changed to ' + e.data.value)
+        }
+      }
+    })
+
+    function send(data){
+      editor.contentWindow.postMessage(data, '*')
+    }
+
+    document.getElementById('dark').onclick = () => {
+      dark = !dark
+      send({ action: 'config', field: 'dark', value: dark })
+    }
+    document.getElementById('run').onclick = () => {
+      send({ action: 'run' })
+    }
+    document.getElementById('title').onclick = () => {
+      const title = prompt('New title', '')
+      if (title)
+        send({ action: 'title', value: title })
+    }
+  </script>
+</body>
