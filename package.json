@@ -1,0 +1,19 @@
+{
+  "name": "wenyan-snippets",
+  "version": "0.0.1",
+  "description": "Snippets site for wenyan-lang",
+  "main": "index.js",
+  "scripts": {
+    "dev": "live-server static --entry-file=index.html"
+  },
+  "keywords": [
+    "wenyan",
+    "wenyan-lang",
+    "snippets"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.1"
+  }
+}
