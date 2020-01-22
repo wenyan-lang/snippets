@@ -12,20 +12,29 @@
   <button id='bars'>Toggle Bars</button>
   <button id='compile'>Toggle Compile Panel</button>
   <button id='output'>Toggle Ouput Panel</button>
+  <button id='configs'>Toggle Configs</button>
+  <br>
   <br>
   <button id='run'>Run</button>
   <button id='clear'>Clear</button>
+  <br>
+  <br>
+
+  <textarea id='out' cols='70' rows='20' readonly></textarea>
   <script>
     const editor = document.getElementById('editor')
+    const out = document.getElementById('out')
     let dark = false
     let compile = false
     let hideOutput = false
     let bars = false
     let large = false
+    let configs = false
 
     window.addEventListener('message', (e) => {
       if (e.data.source === 'wenyan-ide') {
         if (e.data.action === 'change') {
+          out.value = e.data.value
           console.log('Code changed to ' + e.data.value)
         }
       }
@@ -50,6 +59,10 @@
     document.getElementById('output').onclick = () => {
       hideOutput = !hideOutput
       send({ action: 'config', field: 'hideOutput', value: hideOutput })
+    }
+    document.getElementById('configs').onclick = () => {
+      configs = !configs
+      send({ action: 'config', field: 'showConfigs', value: configs })
     }
     document.getElementById('run').onclick = () => {
       send({ action: 'run' })
