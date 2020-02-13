@@ -1,21 +1,28 @@
 <template>
 <div id="app">
-  <home></home>
+  <router-view/>
 </div>
 </template>
 
 <script>
-import Home from './components/Home.vue'
 
 export default {
-  name: 'App',
-  components: {
-    Home
-  }
+  name: 'App'
 }
 </script>
 
 <style lang="stylus">
+html, body 
+  padding 0
+  margin 0
+
+html
+  background #f1f1f1
+
+body
+  background #fff
+  min-height 100vh
+
 #app
   font-family Helvetica, Arial, sans-serif
   -webkit-font-smoothing antialiased
