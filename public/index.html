@@ -1,16 +1,12 @@
-<!-- This is a static file -->
-<!-- served from your routes in server.js -->
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>文言片語 - Snippets for wenyan-lang</title>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" type="image/png" size="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" size="16x16" href="/favicon-16x16.png">
 
-    <!-- import the webpage's stylesheet -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.32.0/codemirror.min.js"></script>
@@ -24,18 +20,14 @@
     <script src="https://code.iconify.design/1/1.0.0-rc1/iconify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.10.2/beautify.js"></script>
     <script src="https://unpkg.com/@wenyanlang/core"></script>
-    
-    <!-- import the webpage's client-side javascript file -->
-    <script src="/client.js" defer></script>
+
+    <title>文言片語 - Snippets for wenyan-lang</title>
   </head>
   <body>
-    <div class="nav">
-      <label class="title">文言片語</label>
-      <input id="search" placeholder="Search snippets..." style="font-size: 20px" size="16" />
-      <span id="btn-search" class="iconify" data-icon="mdi:search" data-inline="false"></span>
-      <span id="btn-new" class="iconify" data-icon="mdi:plus" data-inline="false"></span>
-    </div>
-    <div id="content">
-    </div>
+    <noscript>
+      <strong>We're sorry but 文言片語 doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
   </body>
 </html>
