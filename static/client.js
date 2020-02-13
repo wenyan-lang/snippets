@@ -60,14 +60,6 @@ function newPreview(div, snip) {
   hdr.classList.add("code-header");
   div.appendChild(hdr);
 
-  // var cm = CodeMirror(div, {
-  //   value: snip.code,
-  //   mode:  "wenyan",
-  //   lineNumbers: true,
-  //   theme: "wenyan-light",
-  //   readOnly: true,
-  // });
-  // cm.setSize(300,128);
   var cm = document.createElement("pre");
   cm.classList.add("cm-s-wenyan-light");
   cm.classList.add("code-cell-inner");
@@ -76,7 +68,6 @@ function newPreview(div, snip) {
 
   var ftr = document.createElement("div");
   ftr.innerHTML = `
-    
     <i class="material-icons icon-icon">star</i>
     ${snip.votes || 0}
     <b class="icon-btn" id="btn-upvote"   onclick="onVote(${
@@ -360,14 +351,14 @@ document.getElementById("btn-new").onclick = function () {
   openEditor();
 };
 
-document.getElementById("inp-search").onkeypress = function (k) {
+document.getElementById("search").onkeypress = function (k) {
   if (k.key == "Enter") {
     document.getElementById("btn-search").click();
   }
 };
 
 document.getElementById("btn-search").onclick = function () {
-  var term = document.getElementById("inp-search").value;
+  var term = document.getElementById("search").value;
   document.getElementById("content").innerHTML = "";
   if (term[0] == "#") {
     fetch(`${baseUrl}/one`, {

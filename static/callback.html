@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<body>
+  <pre id='out'></pre>
+  <script>
+    const query = new URLSearchParams(location.search)
+    
+    document.getElementById('out').innerText = JSON.stringify(query.getAll(), null, 2)
+  </script>
+</body>
+
