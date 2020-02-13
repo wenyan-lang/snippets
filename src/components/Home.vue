@@ -7,7 +7,18 @@
     <span @click="newSnippet" class="iconify" data-icon="mdi:plus" data-inline="false"></span>
   </div>
   <div class="showcase">
-    <snippet-preview v-for="(s, idx) in snippets" :snippet="s" :key="idx" @update="data=>updateSnippet(idx, data)"/>
+    <snippet-preview 
+      v-for="(s, idx) in snippets" 
+      :snippet="s" 
+      :key="idx" 
+      @update="data=>updateSnippet(idx, data)"
+      @open="()=>editing = s"
+    />
+  </div>
+  <div class="modal" v-if="editing" @click='editing = null'>
+    <div class="dialog">
+      <editor :snippet="editing"></editor>
+    </div>
   </div>
   <spinner v-show="loading"/>
 </div>
@@ -17,12 +28,14 @@
 import { API } from '../api'
 import SnippetPreview from './SnippetPreview.vue'
 import Spinner from './Spinner.vue'
+import Editor from './Editor.vue'
 
 export default {
   name: 'Home',
   components: {
     SnippetPreview,
     Spinner,
+    Editor,
   },
   data() {
     return {
@@ -31,6 +44,7 @@ export default {
       snippets: {},
       page: 0,
       totalPage: -1,
+      editing: null
     }
   },
   methods: {
@@ -64,7 +78,7 @@ export default {
   top: 0
   left: 0
   right: 0
-  z-index: 100
+  z-index: 1
   white-space: nowrap
 
   *
@@ -91,4 +105,20 @@ export default {
   padding: 1rem
   display: grid
   grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr))
+
+.modal
+  z-index 2
+  position fixed
+  left 0
+  top 0
+  bottom 0
+  right 0
+  background rgba(0,0,0,0.6)
+  
+  .dialog
+    position absolute
+    left 5rem
+    top 5rem
+    bottom 5rem
+    right 5rem
 </style>

@@ -59,8 +59,8 @@ export default {
       // eslint-disable-next-line no-undef
       CodeMirror.runMode(this.snippet.code, 'wenyan', this.$refs.code);
     },
-    openAndRun(){
-      // TODO:
+    openAndRun() {
+      this.$emit('open')
     },
     fork() {
       // TODO:
