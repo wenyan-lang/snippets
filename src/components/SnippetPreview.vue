@@ -7,7 +7,7 @@
 
     <div class='right-aligned'>
       <icon-button @click.native="openAndRun" icon="play"/>
-      <icon-button @click.native="edit" icon="pencil"/>
+      <icon-button @click.native="edit" icon="pencil" v-if="snippet.token === 'public'"/>
       <icon-button @click.native="fork" icon="source-fork"/>
     </div>
   </div>

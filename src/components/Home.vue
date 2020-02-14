@@ -18,8 +18,11 @@
     />
   </div>
   <div class="modal" v-if="editing" @click='editing = null'>
-    <div class="dialog">
-      <editor :snippet="editing"></editor>
+    <div class="dialog" :class="{fullscreen: editingFullscreen}">
+      <editor 
+        :snippet="editing"
+        @fullscreen="i=>editingFullscreen=i"
+      ></editor>
     </div>
   </div>
   <spinner v-show="loading"/>
@@ -47,7 +50,8 @@ export default {
       snippets: [],
       page: 0,
       totalPages: 9999,
-      editing: null
+      editing: null,
+      editingFullscreen: false,
     }
   },
   computed: {
@@ -149,6 +153,16 @@ $max-width = 85rem
     top 5rem
     bottom 5rem
     right 5rem
+    border-radius 5px
+    overflow hidden
+
+    &.fullscreen
+      left 0
+      top 0
+      bottom 0
+      right 0
+      height 100vh
+      border-radius 0
 
 .end-of-pages
   padding 2rem

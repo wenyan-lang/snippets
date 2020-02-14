@@ -1,5 +1,5 @@
 <template>
-<div style="text-align:center">
+<div class="spinner" style="text-align:center">
   <span class="lds-ring">
     <div></div>
   </span>
