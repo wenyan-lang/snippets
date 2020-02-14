@@ -12,6 +12,11 @@ export class API {
     const res = await axios.get(`${API_ROOT}/pages/${page}`)
     return res.data
   }
+
+  static async search(str) {
+    const res = await axios.post(`${API_ROOT}/search`, { keywords: str.split(' ') })
+    return res.data
+  }
   
   static async vote(id, v) {
     const res = await axios.get(`${API_ROOT}/snippets/${id}/vote/${v}`)

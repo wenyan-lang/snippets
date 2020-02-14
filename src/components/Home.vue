@@ -3,14 +3,19 @@
   <div class="nav">
     <div class="content">
       <label class="title">文言片語</label>
-      <input class="search" placeholder="Search snippets..." v-model="searchText"/>
+      <input 
+        v-model="searchText"
+        @keypress.enter="search"
+        class="search" 
+        placeholder="Search snippets..." 
+      />
       <span @click="search" class="iconify" data-icon="mdi:search" data-inline="false"></span>
       <span @click="newSnippet" class="iconify" data-icon="mdi:plus" data-inline="false"></span>
     </div>
   </div>
   <div class="showcase">
     <snippet-preview 
-      v-for="(s, idx) in snippets" 
+      v-for="(s, idx) in (searchResult || snippets)" 
       :snippet="s" 
       :key="idx" 
       @update="data=>updateSnippet(idx, data)"
@@ -46,8 +51,9 @@ export default {
   data() {
     return {
       loading: false,
-      searchText: '',
       snippets: [],
+      searchText: '',
+      searchResult: null,
       page: 0,
       totalPages: 9999,
       editing: null,
@@ -71,13 +77,28 @@ export default {
       this.loading = false
     },
     async search() {
-      // TODO:
+      if (!this.searchText){
+        this.searchResult = null
+        return
+      }
+      this.searchResult = []
+      this.loading = true
+      const text = this.searchText
+      const data = await API.search(text)
+      if (text === this.searchText)
+        this.searchResult = data
+      this.loading = false
     },
     newSnippet() {
       // TODO:
     },
     updateSnippet(idx, snippet) {
       this.$set(this.snippets, idx, snippet)
+    },
+    clearSearch() {
+      this.searchResult = null
+      this.loading = false
+      this.searchText = ''
     }
   },
   mounted() {
@@ -89,6 +110,12 @@ export default {
 
       if (bottomOfWindow)
         this.fetchNext()
+    }
+  },
+  watch: {
+    searchText(){
+      if (!this.searchText)
+        this.clearSearch()
     }
   }
 }

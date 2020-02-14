@@ -16,6 +16,9 @@ export default {
   data() {
     return {
       loading: true,
+      token: 'public',
+      unlocked: false,
+      snapshot: {},
     }
   },
   components: {
@@ -26,23 +29,67 @@ export default {
       this.$refs.iframe.contentWindow.postMessage(data, '*')
     },
     initEditor() {
+      this.snapshot = {...this.snippet}
       this.$refs.iframe.onload = () => {
-        this.send({ 
-          action: 'custom', 
-          value: [{
-            id: 'save',
-            icon: 'content-save',
-          }, {
-            id: 'fullscreen',
-            icon: 'fullscreen',
-            align: 'right'
-          }]
-        })
-        this.send({ action: 'config', field: 'title', value: this.snippet.title })
+        this.updateControls()
+        this.send({ action: 'title', value: this.snippet.title })
+        this.send({ action: 'author', value: this.snippet.author })
         this.send({ action: 'code', value: this.snippet.code })
+        this.send({ action: 'config', field: 'readonly', value: this.locked })
         this.send({ action: 'run' })
         this.loading = false
       }
+    },
+    updateControls() {
+      const controls = []
+
+      if (this.new) {
+        controls.push({
+          id: 'publish',
+          icon: 'cloud-upload'
+        })
+      } else if (this.unsaved) {
+        controls.push({
+          id: 'save',
+          icon: 'content-save',
+        })
+      }
+
+      controls.push({
+        id: 'lock',
+        icon: this.public
+          ? 'earth'
+          : this.unlocked 
+            ? 'lock-open-variant-outline'
+            : 'lock-outline',
+        align: 'right'
+      })
+
+      if (!this.new){
+        controls.push({
+          id: 'fork',
+          icon: 'source-fork',
+          align: 'right'
+        })
+      }
+
+      controls.push({
+        id: 'fullscreen',
+        icon: 'fullscreen',
+        align: 'right'
+      })
+
+      controls.push({
+        id: 'close',
+        icon: 'close',
+        align: 'right'
+      })
+
+      this.send({ 
+        action: 'custom', 
+        field: 'set',
+        value: controls,
+      })
     },
     registerListener () {
       window.addEventListener('message', this.onListener)
@@ -51,15 +98,35 @@ export default {
       window.removeEventListener('message', this.onListener)
     },
     onListener(e) {
-      const { action, source, id } = e.data
+      const { action, source, id, value } = e.data
       if (source !== 'wenyan-ide')
         return
-      if (action === 'custom'){
+      if (action === 'info') {
+        this.snapshot.code = value.code
+        this.snapshot.title = value.title
+        this.snapshot.author = value.author
+        this.updateControls()
+      }
+      else if (action === 'custom'){
         switch (id){
           case 'fullscreen':
             this.$emit('fullscreen', true)
+            break
         }
       }
+    }
+  },
+  computed: {
+    public() {
+      return this.snippet.token === 'public'
+    },
+    new() {
+      return this.snippet.id == null
+    },
+    unsaved () {
+      return this.snippet.code !== this.snapshot.code
+        || this.snippet.title !== this.snapshot.title
+        || this.snippet.author !== this.snapshot.author
     }
   },
   watch: {
