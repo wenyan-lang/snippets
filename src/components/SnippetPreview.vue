@@ -17,8 +17,8 @@
   <div class='footer'>
     <span class='votes'>{{snippet.votes}}</span>
 
-    <icon-button @click.native="voteUp" icon="thumb-up"/>
-    <icon-button @click.native="voteDown" icon="thumb-down"/>
+    <icon-button @click.native="voteUp" :class='{active: snippet.voted === 1}' icon="thumb-up"/>
+    <icon-button @click.native="voteDown" :class='{active: snippet.voted === -1}' icon="thumb-down"/>
 
     <div class='right-aligned'>
       <span class='token'>{{snippet.token}}</span>
@@ -45,11 +45,17 @@ export default {
   },
   methods: {
     async voteUp() {
-      const data = await API.vote(this.snippet.id, +1)
+      const data = await API.vote(
+        this.snippet.id, 
+        this.snippet.voted === 1 ? 'reset' : 'up'
+      )
       this.update(data)
     },
     async voteDown() {
-      const data = await API.vote(this.snippet.id, -1)
+       const data = await API.vote(
+        this.snippet.id, 
+        this.snippet.voted === -1 ? 'reset' : 'down'
+      )
       this.update(data)
     },
     update(data) {
@@ -77,7 +83,7 @@ export default {
 
 <style lang="stylus" scope>
 .snippet-preview
-  margin: 5px
+  margin: 8px
   border-radius: 4px
   border: 1px solid gainsboro
   box-shadow: 1px 1px 1px rgba(0,0,0,0.1)

@@ -16,11 +16,7 @@ html, body
   padding 0
   margin 0
 
-html
-  background #f1f1f1
-
 body
-  background #fff
   min-height 100vh
 
 #app

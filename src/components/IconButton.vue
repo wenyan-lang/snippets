@@ -26,4 +26,7 @@ export default {
 
   &:hover
     opacity: 1
+
+  &.active 
+    color: #E53
 </style>

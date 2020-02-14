@@ -7,9 +7,14 @@ export class API {
     const res = await axios.get(`${API_ROOT}/all`)
     return res.data
   }
+
+  static async getPage(page = 1) {
+    const res = await axios.get(`${API_ROOT}/pages/${page}`)
+    return res.data
+  }
   
-  static async vote(id, increment) {
-    const res = await axios.post(`${API_ROOT}/vote`, { id, increment })
+  static async vote(id, v) {
+    const res = await axios.get(`${API_ROOT}/snippets/${id}/vote/${v}`)
     return res.data
   }
 }

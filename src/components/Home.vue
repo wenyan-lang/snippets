@@ -1,10 +1,12 @@
 <template>
 <div>
   <div class="nav">
-    <label class="title">文言片語</label>
-    <input class="search" placeholder="Search snippets..." v-model="searchText"/>
-    <span @click="search" class="iconify" data-icon="mdi:search" data-inline="false"></span>
-    <span @click="newSnippet" class="iconify" data-icon="mdi:plus" data-inline="false"></span>
+    <div class="content">
+      <label class="title">文言片語</label>
+      <input class="search" placeholder="Search snippets..." v-model="searchText"/>
+      <span @click="search" class="iconify" data-icon="mdi:search" data-inline="false"></span>
+      <span @click="newSnippet" class="iconify" data-icon="mdi:plus" data-inline="false"></span>
+    </div>
   </div>
   <div class="showcase">
     <snippet-preview 
@@ -21,6 +23,7 @@
     </div>
   </div>
   <spinner v-show="loading"/>
+  <div class="end-of-pages" v-if='endOfPages'>you reached the end :)</div>
 </div>
 </template>
 
@@ -39,18 +42,28 @@ export default {
   },
   data() {
     return {
-      loading: true,
+      loading: false,
       searchText: '',
-      snippets: {},
+      snippets: [],
       page: 0,
-      totalPage: -1,
+      totalPages: 9999,
       editing: null
     }
   },
+  computed: {
+    endOfPages(){
+      return this.page >= this.totalPages
+    }
+  },
   methods: {
-    async fetch() {
+    async fetchNext() {
+      if (this.endOfPages || this.loading)
+        return
       this.loading = true
-      this.snippets = await API.getAll()
+      const { snippets, totalPages, page } = await API.getPage(this.page + 1)
+      this.snippets.push(...snippets)
+      this.totalPages = totalPages
+      this.page = page
       this.loading = false
     },
     async search() {
@@ -63,15 +76,24 @@ export default {
       this.$set(this.snippets, idx, snippet)
     }
   },
-  mounted(){
-    this.fetch()
+  mounted() {
+    this.page = 0
+    this.fetchNext()
+
+    window.onscroll = () => {
+      let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
+
+      if (bottomOfWindow)
+        this.fetchNext()
+    }
   }
 }
 </script>
 
 <style lang="stylus">
+$max-width = 85rem
+
 .nav
-  padding: 5px
   background: #f1f1f1
   border-bottom: 1px solid gainsboro
   position: fixed
@@ -81,8 +103,13 @@ export default {
   z-index: 1
   white-space: nowrap
 
-  *
-    vertical-align: middle
+  .content
+    max-width $max-width
+    margin 0 auto
+    padding 5px
+
+    *
+      vertical-align: middle
 
   .iconify 
     font-size: 1.5em
@@ -101,10 +128,11 @@ export default {
     font-size: 1.1em
 
 .showcase
-  margin-top: 3.6rem
   padding: 1rem
   display: grid
   grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr))
+  max-width $max-width
+  margin 3.6rem auto 1rem auto
 
 .modal
   z-index 2
@@ -121,4 +149,10 @@ export default {
     top 5rem
     bottom 5rem
     right 5rem
+
+.end-of-pages
+  padding 2rem
+  opacity 0.3
+  text-align center
+  font-style italic
 </style>
