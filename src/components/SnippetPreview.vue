@@ -7,8 +7,7 @@
 
     <div class='right-aligned'>
       <icon-button @click.native="openAndRun" icon="play"/>
-      <icon-button @click.native="edit" icon="pencil" v-if="snippet.token === 'public'"/>
-      <icon-button @click.native="fork" icon="source-fork"/>
+      <icon-button @click.native="open" icon="open-in-new"/>
     </div>
   </div>
   <pre class='preview cm-s-wenyan-light' ref='code'>
@@ -21,7 +20,7 @@
     <icon-button @click.native="voteDown" :class='{active: snippet.voted === -1}' icon="thumb-down"/>
 
     <div class='right-aligned'>
-      <span class='token'>{{snippet.token}}</span>
+      <icon-button disabled :icon="permissionIcon"/>
     </div>
   </div>
 </div>
@@ -30,9 +29,13 @@
 <script>
 import { API } from '../api'
 import IconButton from './IconButton.vue'
+import { CommonMixin } from '../mixins/common'
 
 export default {
   name: 'SnippetPreview',
+  mixins: [
+    CommonMixin
+  ],
   components: {
     IconButton,
   },
@@ -42,6 +45,15 @@ export default {
   },
   props: {
     snippet: Object,
+  },
+  computed: {
+    permissionIcon() {
+      return this.snippet.token === 'public'
+        ? 'earth'
+        : this.snippet.token === this.userToken
+          ? 'unlocked'
+          : 'lock'
+    }
   },
   methods: {
     async voteUp() {
@@ -68,12 +80,9 @@ export default {
     openAndRun() {
       this.$emit('open')
     },
-    fork() {
-      // TODO:
+    open() {
+      this.gotoSnippet(this.snippet.id, this.snippet)
     },
-    edit() {
-      // TODO:
-    }
   },
   mounted(){
     this.highlight()

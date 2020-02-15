@@ -8,6 +8,16 @@ export class API {
     return res.data
   }
 
+  static async get(id) {
+    const res = await axios.get(`${API_ROOT}/snippets/${id}`)
+    return res.data
+  }
+
+  static async modify(id, snippet) {
+    const res = await axios.put(`${API_ROOT}/snippets/${id}`, snippet)
+    return res.data
+  }
+
   static async getPage(page = 1) {
     const res = await axios.get(`${API_ROOT}/pages/${page}`)
     return res.data

@@ -7,8 +7,12 @@ Vue.use(Router)
 export const router = new Router({
   mode: 'history',
   routes: [{
-    path: '/editor/:id', 
-    name: 'editor', 
+    path: '/new', 
+    name: 'new', 
+    component: Editor, 
+  }, {
+    path: '/snippet/:id', 
+    name: 'snippet', 
     component: Editor, 
     props: true,
   }],

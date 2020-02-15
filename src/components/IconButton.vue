@@ -15,7 +15,7 @@ export default {
 
 <style lang="stylus" scoped>
 .icon-button
-  opacity 0.6
+  opacity 0.8
   cursor pointer
   display inline-block
   line-height 0px !important
@@ -27,6 +27,10 @@ export default {
   &:hover
     opacity: 1
 
-  &.active 
+  &.active
     color: #E53
+
+  &[disabled]
+    opacity 0.5
+    pointer-events none
 </style>

@@ -16,6 +16,9 @@ export const store = new Vuex.Store({
       title: '',
       code: '',
       token: '',
+    },
+    temp: {
+      snippets: {}
     }
   },
   mutations: {
@@ -37,11 +40,19 @@ export const store = new Vuex.Store({
         code: '',
         token: '',
       }
+    },
+    updateSnippets(state, data) {
+      Object.assign(state.temp.snippets, data)
+      Vue.set(state.temp, 'snippets', state.temp.snippets)
+    },
+    invalidSnippet(state, id) {
+      Vue.delete(state.temp.snippets, id)
     }
   },
   plugins: [
     createPersistedState({
-      key: 'wenyan-snippets'
+      key: 'wenyan-snippets',
+      reducer: (state) => ({...state, temp: undefined}),
     })
   ]
 })

@@ -2,7 +2,7 @@
 <div class="home">
   <div class="nav">
     <div class="nav-inner">
-      <label class="title">文言片語</label>
+      <label class="title" @click='$router.push("/")'>文言片語</label>
       <input 
         v-model="searchText"
         @keypress.enter="search"
@@ -18,9 +18,7 @@
   </div>
   <div class="content" ref='content'>
     <template v-if="$route.path !== '/'">
-    <div class="page">
       <router-view/>
-    </div>
     </template>
     <template v-else>
       <div class="showcase">
@@ -37,11 +35,12 @@
     </template>
   </div>
   <div class="modal" v-if="editing" @click='editing = false'>
-    <div class="dialog" :class="{fullscreen: editingFullscreen}">
+    <div class="dialog">
       <editor 
         :snippet="editingSnippet || undefined"
-        @fullscreen="i => editingFullscreen = i"
-      ></editor>
+        :in-dialog="true"
+        @close='editing = false'
+      />
     </div>
   </div>
 </div>
@@ -77,13 +76,17 @@ export default {
     }
   },
   computed: {
-    endOfPages(){
+    endOfPages() {
       return this.page >= this.totalPages
+    },
+    // page is used for other route instead of snippets listing
+    routed() {
+      return this.$route.path !== '/'
     }
   },
   methods: {
     async fetchNext() {
-      if (this.endOfPages || this.loading)
+      if (this.endOfPages || this.loading || this.routed)
         return
       this.loading = true
       const { snippets, totalPages, page } = await API.getPage(this.page + 1)
@@ -93,7 +96,7 @@ export default {
       this.loading = false
     },
     async search() {
-      if (!this.searchText){
+      if (!this.searchText) {
         this.searchResult = null
         return
       }
@@ -131,7 +134,7 @@ export default {
     }
   },
   watch: {
-    searchText(){
+    searchText() {
       if (!this.searchText)
         this.clearSearch()
     }

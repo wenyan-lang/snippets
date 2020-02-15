@@ -16,6 +16,7 @@ export default {
     CommonMixin
   ],
   props: {
+    id: String,
     snippet: Object,
     inDialog: Boolean,
   },
@@ -30,27 +31,38 @@ export default {
     Spinner,
   },
   methods: {
-    send(data){
+    send(data) {
       this.$refs.iframe.contentWindow.postMessage(data, '*')
     },
-    initEditor() {
-      if (this.snippet){
-        this.snapshot = {...this.snippet}
+    async initSnapshot() {
+      if (this.snippet) {
+        this.snapshot = { ...this.snippet }
       }
       else {
-        this.snapshot = {
-          id: null,
-          token: this.userToken,
-          author: this.userName,
-          title: 'Untitled',
-          code: '',
+        if (this.id) {
+          this.snapshot = await this.getSnippet(this.id)
+          if (!this.snapshot) {
+            // TODO:
+          }
         }
-        if (this.draft) {
-          this.snapshot.title = this.draft.title
-          this.snapshot.code = this.draft.code
-          this.snapshot.token = this.draft.token
+        else {
+          this.snapshot = {
+            id: null,
+            token: this.userToken,
+            author: this.userName,
+            title: 'Untitled',
+            code: '',
+          }
+          if (this.draft) {
+            this.snapshot.title = this.draft.title
+            this.snapshot.code = this.draft.code
+            this.snapshot.token = this.draft.token
+          }
         }
       }
+    },
+    async initEditor() {
+      await this.initSnapshot()
       this.$refs.iframe.onload = () => {
         this.updateControls()
         this.send({ action: 'title', value: this.snapshot.title })
@@ -86,7 +98,13 @@ export default {
         align: 'right'
       })
 
-      if (!this.new){
+      if (!this.new) {
+        controls.push({
+          id: 'share',
+          icon: 'link-variant',
+          align: 'right'
+        })
+        
         controls.push({
           id: 'fork',
           icon: 'source-fork',
@@ -96,8 +114,8 @@ export default {
 
       if (this.inDialog) {
         controls.push({
-          id: 'fullscreen',
-          icon: 'fullscreen',
+          id: 'open-in-editor',
+          icon: 'open-in-new',
           align: 'right'
         })
 
@@ -142,15 +160,25 @@ export default {
       }
       else if (action === 'custom') {
         switch (id){
-          case 'fullscreen':
-            this.$emit('fullscreen', true)
+          case 'open-in-editor':
+            this.gotoSnippet(this.snapshot.id, this.snapshot)
+            this.$emit('close')
             break
           case 'lock':
             this.toggleLock()
             this.updateControls()
             break
+          case 'share':
+            prompt('Copy the following link', `${window.location.origin}/snippet/${this.snapshot.id}`)
+            break
           case 'publish':
             this.publish()
+            break
+          case 'save':
+            this.save()
+            break
+          case 'close':
+            this.$emit('close')
             break
         }
       }
@@ -163,8 +191,14 @@ export default {
       this.draft = null
       this.gotoSnippet(id)
     },
-    gotoSnippet(id) {
-      id// TODO:
+    async save() {
+      try {
+        await API.modify(this.snapshot.id, this.snapshot)
+        this.snippet = { ...this.snapshot }
+        this.setSnippetCache(this.snapshot)
+      } catch (e) {
+        console.error(e)
+      }
     }
   },
   computed: {
