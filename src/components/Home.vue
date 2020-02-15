@@ -1,7 +1,7 @@
 <template>
-<div>
+<div class="home">
   <div class="nav">
-    <div class="content">
+    <div class="nav-inner">
       <label class="title">文言片語</label>
       <input 
         v-model="searchText"
@@ -16,14 +16,25 @@
       </div>
     </div>
   </div>
-  <div class="showcase">
-    <snippet-preview 
-      v-for="(s, idx) in (searchResult || snippets)" 
-      :snippet="s" 
-      :key="idx" 
-      @update="data=>updateSnippet(idx, data)"
-      @open="()=>{ editing = true; editingSnippet = s }"
-    />
+  <div class="content" ref='content'>
+    <template v-if="$route.path !== '/'">
+    <div class="page">
+      <router-view/>
+    </div>
+    </template>
+    <template v-else>
+      <div class="showcase">
+        <snippet-preview 
+          v-for="(s, idx) in (searchResult || snippets)" 
+          :snippet="s" 
+          :key="idx" 
+          @update="data=>updateSnippet(idx, data)"
+          @open="()=>{ editing = true; editingSnippet = s }"
+        />
+      </div>
+      <spinner v-show="loading"/>
+      <div class="end-of-pages" v-if='endOfPages'>you reached the end :)</div>
+    </template>
   </div>
   <div class="modal" v-if="editing" @click='editing = false'>
     <div class="dialog" :class="{fullscreen: editingFullscreen}">
@@ -33,8 +44,6 @@
       ></editor>
     </div>
   </div>
-  <spinner v-show="loading"/>
-  <div class="end-of-pages" v-if='endOfPages'>you reached the end :)</div>
 </div>
 </template>
 
@@ -114,7 +123,7 @@ export default {
     this.page = 0
     this.fetchNext()
 
-    window.onscroll = () => {
+    this.$refs.content.onscroll = () => {
       let bottomOfWindow = Math.max(window.pageYOffset, document.documentElement.scrollTop, document.body.scrollTop) + window.innerHeight === document.documentElement.offsetHeight
 
       if (bottomOfWindow)
@@ -133,17 +142,28 @@ export default {
 <style lang="stylus">
 $max-width = 85rem
 
+.home 
+  height 100vh
+  display grid 
+  grid-template-rows max-content 1fr
+
+  & > .content
+    height 100%
+    overflow auto
+
+  .showcase
+    padding: 1rem
+    display: grid
+    grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr))
+    max-width $max-width
+    margin 0.5rem auto
+
 .nav
   background: #f1f1f1
   border-bottom: 1px solid gainsboro
-  position: fixed
-  top: 0
-  left: 0
-  right: 0
-  z-index: 1
   white-space: nowrap
 
-  .content
+  .nav-inner
     max-width $max-width
     margin 0 auto
     padding 0.05rem 1rem
@@ -166,7 +186,7 @@ $max-width = 85rem
     opacity: 0.8
 
     .iconify 
-      font-size: 1.5em
+      font-size: 1.5rem !important
       
     &:hover
       opacity: 1
@@ -180,13 +200,6 @@ $max-width = 85rem
     color: #777
     margin: 0.5rem 1rem
     font-size: 1.1em
-
-.showcase
-  padding: 1rem
-  display: grid
-  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr))
-  max-width $max-width
-  margin 3.6rem auto 1rem auto
 
 .modal
   z-index 2

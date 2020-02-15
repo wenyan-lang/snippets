@@ -16,7 +16,8 @@ export default {
     CommonMixin
   ],
   props: {
-    snippet: Object
+    snippet: Object,
+    inDialog: Boolean,
   },
   data() {
     return {
@@ -93,17 +94,19 @@ export default {
         })
       }
 
-      controls.push({
-        id: 'fullscreen',
-        icon: 'fullscreen',
-        align: 'right'
-      })
+      if (this.inDialog) {
+        controls.push({
+          id: 'fullscreen',
+          icon: 'fullscreen',
+          align: 'right'
+        })
 
-      controls.push({
-        id: 'close',
-        icon: 'close',
-        align: 'right'
-      })
+        controls.push({
+          id: 'close',
+          icon: 'close',
+          align: 'right'
+        })
+      }
 
       this.send({ 
         action: 'custom', 
@@ -195,7 +198,7 @@ export default {
 
 <style lang="stylus" scoped>
 .editor
-  border 1px solid gainsboro
+  border 0
   background white
   position relative
   height 100%
