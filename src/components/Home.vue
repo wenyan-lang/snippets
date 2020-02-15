@@ -34,8 +34,8 @@
       <div class="end-of-pages" v-if='endOfPages'>you reached the end :)</div>
     </template>
   </div>
-  <div class="modal" v-if="editing" @click='editing = false'>
-    <div class="dialog">
+  <div class="modal" v-if="editing">
+    <div class="editor dialog">
       <editor 
         :snippet="editingSnippet || undefined"
         :in-dialog="true"
@@ -43,11 +43,25 @@
       />
     </div>
   </div>
+  <div class="modal" v-if="showProfile" >
+    <div class="profile dialog" @click.prevent=''>
+      <label>Username</label>
+      <br/>
+      <input v-model='userName' placeholder="Username"/>
+      <br/>
+      <label>Token</label>
+      <br/>
+      <input v-model='userToken' placeholder="Token"/>
+      <br/>
+      <button @click='showProfile = false'>Close</button>
+    </div>
+  </div>
 </div>
 </template>
 
 <script>
 import { API } from '../api'
+import { CommonMixin } from '../mixins/common'
 import SnippetPreview from './SnippetPreview.vue'
 import Spinner from './Spinner.vue'
 import IconButton from './IconButton.vue'
@@ -55,6 +69,9 @@ import Editor from './Editor.vue'
 
 export default {
   name: 'Home',
+  mixins: [
+    CommonMixin,
+  ],
   components: {
     SnippetPreview,
     Spinner,
@@ -109,9 +126,7 @@ export default {
       this.loading = false
     },
     newSnippet() {
-      this.editingSnippet = null
-      this.editing = true
-      console.log('hi')
+      this.$router.push({ name: 'new' })
     },
     updateSnippet(idx, snippet) {
       this.$set(this.snippets, idx, snippet)
@@ -137,6 +152,10 @@ export default {
     searchText() {
       if (!this.searchText)
         this.clearSearch()
+    },
+    routed() {
+      if (this.page === 0)
+        this.fetchNext()
     }
   }
 }
@@ -215,20 +234,23 @@ $max-width = 85rem
   
   .dialog
     position absolute
-    left 5rem
-    top 5rem
-    bottom 5rem
-    right 5rem
     border-radius 5px
     overflow hidden
 
-    &.fullscreen
-      left 0
-      top 0
-      bottom 0
-      right 0
-      height 100vh
-      border-radius 0
+    &.editor
+      left 5rem
+      top 5rem
+      bottom 5rem
+      right 5rem
+
+    &.profile
+      left 50%
+      top 50%
+      height 250px
+      width 250px
+      background white
+      padding 20px
+      transform translate(-50%, -50%)
 
 .end-of-pages
   padding 2rem

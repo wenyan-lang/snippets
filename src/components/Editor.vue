@@ -53,7 +53,7 @@ export default {
             title: 'Untitled',
             code: '',
           }
-          if (this.draft) {
+          if (this.draft && confirm(`Unsaved draft "${this.draft.title}", do you want to load it?`)) {
             this.snapshot.title = this.draft.title
             this.snapshot.code = this.draft.code
             this.snapshot.token = this.draft.token
@@ -148,7 +148,12 @@ export default {
       this.snapshot.code = snap.code
       this.snapshot.title = snap.name
       this.snapshot.author = snap.author
-      this.draft = this.snapshot
+      if (this.new) {
+        if (snap.code)
+          this.draft = this.snapshot
+        else
+          this.draft = ''
+      }
       this.updateControls()
     },
     onListener(e) {

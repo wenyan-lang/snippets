@@ -1,12 +1,22 @@
 import { API } from '../api'
 
 export const CommonMixin = {
-  computed:{
-    userToken() {
-      return this.$store.state.user.token
+  computed: {
+    userToken: {
+      get() {
+        return this.$store.state.user.token
+      },
+      set(token) {
+        this.$store.commit('saveUser', {token})
+      }
     },
-    userName() {
-      return this.$store.state.user.name
+    userName: {
+      get () {
+        return this.$store.state.user.name
+      },
+      set(name) {
+        this.$store.commit('saveUser', {name})
+      }
     },
     draft: {
       get() {
