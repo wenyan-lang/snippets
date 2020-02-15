@@ -1,5 +1,5 @@
 <template>
-<span class="icon-button">
+<span class="icon-button" @click='e=>$emit("click",e)'>
   <span class="iconify" :data-icon="`mdi:${icon}`" data-inline="false"></span>
 </span>
 </template>

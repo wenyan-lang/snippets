@@ -22,4 +22,9 @@ export class API {
     const res = await axios.get(`${API_ROOT}/snippets/${id}/vote/${v}`)
     return res.data
   }
+
+  static async publish(data) {
+    const res = await axios.post(`${API_ROOT}/snippets`, data)
+    return res.data
+  }
 }

@@ -9,8 +9,11 @@
         class="search" 
         placeholder="Search snippets..." 
       />
-      <span @click="search" class="iconify" data-icon="mdi:search" data-inline="false"></span>
-      <span @click="newSnippet" class="iconify" data-icon="mdi:plus" data-inline="false"></span>
+      <icon-button @click="search" icon="search"/>
+      <div class="right-aligned">
+        <icon-button @click="newSnippet" icon="plus"/>
+        <icon-button @click="showProfile = !showProfile" icon="account"/>
+      </div>
     </div>
   </div>
   <div class="showcase">
@@ -19,14 +22,14 @@
       :snippet="s" 
       :key="idx" 
       @update="data=>updateSnippet(idx, data)"
-      @open="()=>editing = s"
+      @open="()=>{ editing = true; editingSnippet = s }"
     />
   </div>
-  <div class="modal" v-if="editing" @click='editing = null'>
+  <div class="modal" v-if="editing" @click='editing = false'>
     <div class="dialog" :class="{fullscreen: editingFullscreen}">
       <editor 
-        :snippet="editing"
-        @fullscreen="i=>editingFullscreen=i"
+        :snippet="editingSnippet || undefined"
+        @fullscreen="i => editingFullscreen = i"
       ></editor>
     </div>
   </div>
@@ -39,6 +42,7 @@
 import { API } from '../api'
 import SnippetPreview from './SnippetPreview.vue'
 import Spinner from './Spinner.vue'
+import IconButton from './IconButton.vue'
 import Editor from './Editor.vue'
 
 export default {
@@ -47,6 +51,7 @@ export default {
     SnippetPreview,
     Spinner,
     Editor,
+    IconButton,
   },
   data() {
     return {
@@ -56,8 +61,10 @@ export default {
       searchResult: null,
       page: 0,
       totalPages: 9999,
-      editing: null,
+      editing: false,
+      editingSnippet: null,
       editingFullscreen: false,
+      showProfile: false,
     }
   },
   computed: {
@@ -90,7 +97,9 @@ export default {
       this.loading = false
     },
     newSnippet() {
-      // TODO:
+      this.editingSnippet = null
+      this.editing = true
+      console.log('hi')
     },
     updateSnippet(idx, snippet) {
       this.$set(this.snippets, idx, snippet)
@@ -137,16 +146,30 @@ $max-width = 85rem
   .content
     max-width $max-width
     margin 0 auto
-    padding 5px
+    padding 0.05rem 1rem
+    position relative
 
     *
       vertical-align: middle
 
-  .iconify 
-    font-size: 1.5em
+    .right-aligned
+      position: absolute
+      right: 0
+      top: 0
+      bottom: 0
+      padding: 0.5rem 1.3rem
+
+  .icon-button
     margin: 0.3rem
     color: #444
     cursor: pointer
+    opacity: 0.8
+
+    .iconify 
+      font-size: 1.5em
+      
+    &:hover
+      opacity: 1
 
   .search
     margin: 0.5rem

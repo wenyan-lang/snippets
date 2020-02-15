@@ -27,6 +27,14 @@ body, html {
   cursor: pointer;
 }
 
+.nav .right-aligned {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 5px;
+}
+
 .nav input {
   margin: 0.5rem;
   padding: 0.1rem 0.5rem;

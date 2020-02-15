@@ -6,17 +6,21 @@
 </template>
 
 <script>
+import { API } from '../api'
+import { CommonMixin } from '../mixins/common'
 import Spinner from './Spinner.vue'
 
 export default {
   name: 'Editor',
+  mixins: [
+    CommonMixin
+  ],
   props: {
     snippet: Object
   },
   data() {
     return {
       loading: true,
-      token: 'public',
       unlocked: false,
       snapshot: {},
     }
@@ -29,12 +33,28 @@ export default {
       this.$refs.iframe.contentWindow.postMessage(data, '*')
     },
     initEditor() {
-      this.snapshot = {...this.snippet}
+      if (this.snippet){
+        this.snapshot = {...this.snippet}
+      }
+      else {
+        this.snapshot = {
+          id: null,
+          token: this.userToken,
+          author: this.userName,
+          title: 'Untitled',
+          code: '',
+        }
+        if (this.draft) {
+          this.snapshot.title = this.draft.title
+          this.snapshot.code = this.draft.code
+          this.snapshot.token = this.draft.token
+        }
+      }
       this.$refs.iframe.onload = () => {
         this.updateControls()
-        this.send({ action: 'title', value: this.snippet.title })
-        this.send({ action: 'author', value: this.snippet.author })
-        this.send({ action: 'code', value: this.snippet.code })
+        this.send({ action: 'title', value: this.snapshot.title })
+        this.send({ action: 'author', value: this.snapshot.author })
+        this.send({ action: 'code', value: this.snapshot.code })
         this.send({ action: 'config', field: 'readonly', value: this.locked })
         this.send({ action: 'run' })
         this.loading = false
@@ -97,34 +117,63 @@ export default {
     unregisterListener(){
       window.removeEventListener('message', this.onListener)
     },
+    toggleLock() {
+      if (this.snapshot.token === 'public') 
+        this.snapshot.token = this.$store.state.user.token
+      else
+        this.snapshot.token = 'public'
+    },
+    onChanged(snap){
+      this.snapshot.code = snap.code
+      this.snapshot.title = snap.name
+      this.snapshot.author = snap.author
+      this.draft = this.snapshot
+      this.updateControls()
+    },
     onListener(e) {
       const { action, source, id, value } = e.data
       if (source !== 'wenyan-ide')
         return
       if (action === 'info') {
-        this.snapshot.code = value.code
-        this.snapshot.title = value.title
-        this.snapshot.author = value.author
-        this.updateControls()
+        this.onChanged(value)
       }
-      else if (action === 'custom'){
+      else if (action === 'custom') {
         switch (id){
           case 'fullscreen':
             this.$emit('fullscreen', true)
             break
+          case 'lock':
+            this.toggleLock()
+            this.updateControls()
+            break
+          case 'publish':
+            this.publish()
+            break
         }
       }
+    },
+    async publish() {
+      if (!confirm(`Publishing this script?\n\nTitle: ${this.snapshot.title}\nAuthor: ${this.snapshot.author}\nToken: ${this.snapshot.token}`))
+        return
+      
+      const { id } = await API.publish(this.snapshot)
+      this.draft = null
+      this.gotoSnippet(id)
+    },
+    gotoSnippet(id) {
+      id// TODO:
     }
   },
   computed: {
     public() {
-      return this.snippet.token === 'public'
+      return this.snapshot.token === 'public'
     },
     new() {
-      return this.snippet.id == null
+      return this.snapshot.id == null
     },
     unsaved () {
-      return this.snippet.code !== this.snapshot.code
+      return !this.snippet
+        || this.snippet.code !== this.snapshot.code
         || this.snippet.title !== this.snapshot.title
         || this.snippet.author !== this.snapshot.author
     }
