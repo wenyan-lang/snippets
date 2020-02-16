@@ -45,7 +45,8 @@ export default {
       else {
         if (this.id) {
           try {
-            this.snapshot = await this.getSnippet(this.id)
+            this.snippet = await this.getSnippet(this.id)
+            this.snapshot = { ...this.snippet }
           }
           catch(error) {
             this.loading = false
@@ -103,7 +104,8 @@ export default {
           : this.unlocked 
             ? 'lock-open-variant-outline'
             : 'lock-outline',
-        align: 'right'
+        align: 'right',
+        disabled: !this.new,
       })
 
       if (!this.new) {
@@ -171,6 +173,12 @@ export default {
       if (action === 'info') {
         this.onChanged(value)
       }
+      else if (action === 'save') {
+        if (this.new)
+          this.publish()
+        else
+          this.save()
+      }
       else if (action === 'custom') {
         switch (id){
           case 'open-in-editor':
@@ -212,11 +220,13 @@ export default {
     async save() {
       try {
         await API.modify(this.snapshot.id, this.snapshot)
-        this.snippet = { ...this.snapshot }
+        this.$set(this, 'snippet', { ...this.snapshot })
+        this.$emit('notify', { message: 'Saved', type: 'success' })
         this.setSnippetCache(this.snapshot)
       } catch (error) {
         this.$emit('notify', { error })
       }
+      this.updateControls()
     }
   },
   computed: {

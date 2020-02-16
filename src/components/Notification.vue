@@ -14,7 +14,7 @@ export default {
       data: {
         message: '',
         type: 'info',
-        timeout: 3000,
+        timeout: 2000,
         error: null,
       },
       shown: false,
@@ -58,7 +58,7 @@ export default {
 .notification
   position fixed
   right 1.5rem
-  top 1.5rem
+  bottom 1.5rem
   width 18rem
   background white
   border-radius 3px
