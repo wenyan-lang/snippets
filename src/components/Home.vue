@@ -59,6 +59,7 @@
       <button @click='showProfile = false'>OK</button>
     </div>
   </div>
+  <notification ref='notify'/> 
 </div>
 </template>
 
@@ -70,6 +71,7 @@ import SnippetPreview from './SnippetPreview.vue'
 import Spinner from './Spinner.vue'
 import IconButton from './IconButton.vue'
 import Editor from './Editor.vue'
+import Notification from './Notification.vue'
 
 export default {
   name: 'Home',
@@ -81,6 +83,7 @@ export default {
     Spinner,
     Editor,
     IconButton,
+    Notification,
   },
   data() {
     return {
@@ -298,7 +301,6 @@ $max-width = 85rem
   
   button.icon
     margin-left 0.4rem
-
 
 .end-of-pages
   padding 2rem
