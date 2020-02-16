@@ -31,7 +31,7 @@
         <snippet-preview 
           v-for="(s, idx) in (searchResult || snippets)" 
           :snippet="s" 
-          :key="idx" 
+          :key="s.id" 
           @update="data=>updateSnippet(idx, data)"
           @open="()=>{ editing = true; editingSnippet = s }"
           @notify='notify'

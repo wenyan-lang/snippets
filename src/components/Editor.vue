@@ -28,6 +28,7 @@ export default {
       loading: true,
       unlocked: false,
       snapshot: {},
+      iframeLoaded: false,
     }
   },
   components: {
@@ -72,7 +73,7 @@ export default {
     },
     async initEditor() {
       await this.initSnapshot()
-      this.$refs.iframe.onload = () => {
+      const load = () => {
         this.updateControls()
         this.send({ action: 'title', value: this.snapshot.title })
         this.send({ action: 'author', value: this.snapshot.author })
@@ -80,7 +81,12 @@ export default {
         this.send({ action: 'config', field: 'readonly', value: this.locked })
         this.send({ action: 'run' })
         this.loading = false
+        this.iframeLoaded = true
       }
+      if (this.iframeLoaded)
+        load()
+      else
+        this.$refs.iframe.onload = load
     },
     updateControls() {
       const controls = []
@@ -198,6 +204,9 @@ export default {
           case 'save':
             this.save()
             break
+          case 'fork':
+            this.fork()
+            break
           case 'close':
             this.$emit('close')
             break
@@ -227,6 +236,20 @@ export default {
         this.$emit('notify', { error })
       }
       this.updateControls()
+    },
+    async fork() {
+      this.$router.push({
+        name: 'new', 
+        params: {
+          id: null,
+          snippet: {
+            ...this.snapshot,
+            id: undefined, 
+            origin: this.snapshot.id,
+            author: this.userName,
+          },
+        },
+      })
     }
   },
   computed: {

@@ -11,6 +11,7 @@ export const router = new Router({
     path: '/new', 
     name: 'new', 
     component: Editor, 
+    props: true,
   }, {
     path: '/snippet/:id', 
     name: 'snippet', 
@@ -23,5 +24,6 @@ export const router = new Router({
     path: '*', 
     name: 'error', 
     component: ErrorPage, 
+    props: true,
   }],
 })
