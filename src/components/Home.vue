@@ -46,20 +46,24 @@
   <div class="modal" v-if="showProfile" >
     <div class="profile dialog" @click.prevent=''>
       <label>Username</label>
-      <br/>
       <input v-model='userName' placeholder="Username"/>
-      <br/>
       <label>Token</label>
-      <br/>
-      <input v-model='userToken' placeholder="Token"/>
-      <br/>
-      <button @click='showProfile = false'>Close</button>
+      <input v-model='userToken' disabled placeholder="Token"/>
+      <button class="icon" @click='enterToken'>
+        <span class="iconify" data-icon="mdi:cursor-text" data-inline="false"></span>
+      </button>
+      <button class="icon" @click='resetToken'>
+        <span class="iconify" data-icon="mdi:refresh" data-inline="false"></span>
+      </button>
+
+      <button @click='showProfile = false'>OK</button>
     </div>
   </div>
 </div>
 </template>
 
 <script>
+import nanoid from 'nanoid'
 import { API } from '../api'
 import { CommonMixin } from '../mixins/common'
 import SnippetPreview from './SnippetPreview.vue'
@@ -135,6 +139,29 @@ export default {
       this.searchResult = null
       this.loading = false
       this.searchText = ''
+    },
+    promptChangeToken(){
+      return confirm('Token is like the password to snippets. If you changed your token, you will LOSE the control of your snippets you created before. \n\nAre you sure to change it?')
+    },
+    enterToken() {
+      if (!this.promptChangeToken())
+        return
+      
+      const token = prompt('Enter the token', this.userToken)
+
+      if (!token || token === 'public')
+        alert('Invalid Token. Please try again.')
+      else {
+        this.userToken = token
+        location.reload()
+      }
+    },
+    resetToken() {
+      if (!this.promptChangeToken())
+        return
+
+      this.userToken = nanoid(12)
+      location.reload()
     }
   },
   mounted() {
@@ -246,11 +273,32 @@ $max-width = 85rem
     &.profile
       left 50%
       top 50%
-      height 250px
+      height 175px
       width 250px
       background white
       padding 20px
       transform translate(-50%, -50%)
+
+.profile
+  & > *
+    vertical-align middle
+
+  label
+    display block
+    margin 0.6rem 0 0 0
+  
+  input
+    font-size 1em
+    margin 0.4rem 0
+
+  button:not(.icon)
+    margin 0.8rem 0
+    font-size 0.8em
+    padding 4px
+  
+  button.icon
+    margin-left 0.4rem
+
 
 .end-of-pages
   padding 2rem

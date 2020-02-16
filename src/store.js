@@ -24,7 +24,7 @@ export const store = new Vuex.Store({
   mutations: {
     init(state) {
       if (!state.user.token)
-        state.user.token = nanoid(8)
+        state.user.token = nanoid(12)
     },
     saveUser(state, data) {
       Object.assign(state.user, data)
