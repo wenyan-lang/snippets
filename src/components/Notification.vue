@@ -15,6 +15,7 @@ export default {
         message: '',
         type: 'info',
         timeout: 3000,
+        error: null,
       },
       shown: false,
     }
@@ -23,15 +24,26 @@ export default {
     show(data) {
       clearTimeout(this.timer)
 
-      const {
+      if (typeof data === 'string')
+        data = { message: data }
+        
+      let {
         message = '',
         type = 'info',
-        timeout = 3000,
+        timeout = 4000,
+        error = null,
       } = data
+
+      if (error) {
+        type = 'error'
+        message += error.message
+      }
+
       this.data = {
         message,
         type,
-        timeout
+        timeout,
+        error,
       }
       this.timer = setTimeout(()=>{
         this.shown = false

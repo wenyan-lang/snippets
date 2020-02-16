@@ -40,9 +40,11 @@ export default {
       }
       else {
         if (this.id) {
-          this.snapshot = await this.getSnippet(this.id)
-          if (!this.snapshot) {
-            // TODO:
+          try {
+            this.snapshot = await this.getSnippet(this.id)
+          }
+          catch(error) {
+            this.$emit('notify', { error })
           }
         }
         else {
@@ -192,17 +194,22 @@ export default {
       if (!confirm(`Publishing this script?\n\nTitle: ${this.snapshot.title}\nAuthor: ${this.snapshot.author}\nToken: ${this.snapshot.token}`))
         return
       
-      const { id } = await API.publish(this.snapshot)
-      this.draft = null
-      this.gotoSnippet(id)
+      try {
+        const { id } = await API.publish(this.snapshot)
+        this.draft = null
+        this.$emit('notify', { message: 'Snippet published!', type: 'success' })
+        this.gotoSnippet(id.toString())
+      } catch (error) {
+        this.$emit('notify', { error })
+      }
     },
     async save() {
       try {
         await API.modify(this.snapshot.id, this.snapshot)
         this.snippet = { ...this.snapshot }
         this.setSnippetCache(this.snapshot)
-      } catch (e) {
-        console.error(e)
+      } catch (error) {
+        this.$emit('notify', { error })
       }
     }
   },

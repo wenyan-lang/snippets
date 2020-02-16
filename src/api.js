@@ -3,13 +3,8 @@ import axios from 'axios'
 export const API_ROOT = 'https://wenyan-snippets.glitch.me'
 
 export class API {
-  static async getAll() {
-    const res = await axios.get(`${API_ROOT}/all`)
-    return res.data
-  }
-
-  static async get(id) {
-    const res = await axios.get(`${API_ROOT}/snippets/${id}`)
+  static async get(id, token) {
+    const res = await axios.get(`${API_ROOT}/snippets/${id}`, { params: { token }})
     return res.data
   }
 
@@ -18,18 +13,18 @@ export class API {
     return res.data
   }
 
-  static async getPage(page = 1) {
-    const res = await axios.get(`${API_ROOT}/pages/${page}`)
+  static async getPage(page = 1, token) {
+    const res = await axios.get(`${API_ROOT}/pages/${page}`, { params: { token }})
     return res.data
   }
 
-  static async search(str) {
-    const res = await axios.post(`${API_ROOT}/search`, { keywords: str.split(' ') })
+  static async search(str, token) {
+    const res = await axios.post(`${API_ROOT}/search`, { keywords: str.split(' '), token })
     return res.data
   }
   
-  static async vote(id, v) {
-    const res = await axios.get(`${API_ROOT}/snippets/${id}/vote/${v}`)
+  static async vote(id, v, token) {
+    const res = await axios.get(`${API_ROOT}/snippets/${id}/vote/${v}`, { params: { token }})
     return res.data
   }
 

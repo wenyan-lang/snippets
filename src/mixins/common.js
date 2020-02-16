@@ -47,12 +47,7 @@ export const CommonMixin = {
       if (cache)
         return cache
       
-      try {
-        return await API.get(id)
-      } catch(e) {
-        console.error(e)
-        return undefined
-      }
+      return await API.get(id, this.userToken)
     }
   }
 }

@@ -18,7 +18,9 @@
   </div>
   <div class="content" ref='content'>
     <template v-if="$route.path !== '/'">
-      <router-view/>
+      <router-view
+        @notify='notify'
+      />
     </template>
     <template v-else>
       <div class="showcase">
@@ -28,6 +30,7 @@
           :key="idx" 
           @update="data=>updateSnippet(idx, data)"
           @open="()=>{ editing = true; editingSnippet = s }"
+          @notify='notify'
         />
       </div>
       <spinner v-show="loading"/>
@@ -40,6 +43,7 @@
         :snippet="editingSnippet || undefined"
         :in-dialog="true"
         @close='editing = false'
+        @notify='notify'
       />
     </div>
   </div>
@@ -55,7 +59,7 @@
       <button class="icon" @click='resetToken'>
         <span class="iconify" data-icon="mdi:refresh" data-inline="false"></span>
       </button>
-
+      <br>
       <button @click='showProfile = false'>OK</button>
     </div>
   </div>
@@ -113,7 +117,7 @@ export default {
       if (this.endOfPages || this.loading || this.routed)
         return
       this.loading = true
-      const { snippets, totalPages, page } = await API.getPage(this.page + 1)
+      const { snippets, totalPages, page } = await API.getPage(this.page + 1, this.userToken)
       this.snippets.push(...snippets)
       this.totalPages = totalPages
       this.page = page
@@ -127,7 +131,7 @@ export default {
       this.searchResult = []
       this.loading = true
       const text = this.searchText
-      const data = await API.search(text)
+      const data = await API.search(text, this.userToken)
       if (text === this.searchText)
         this.searchResult = data
       this.loading = false
@@ -165,6 +169,9 @@ export default {
 
       this.userToken = nanoid(12)
       location.reload()
+    },
+    notify(data) {
+      this.$refs.notify.show(data)
     }
   },
   mounted() {
@@ -245,13 +252,14 @@ $max-width = 85rem
 
   .search
     margin: 0.5rem
-    padding: 0.1rem 0.5rem
+    padding: 0.2rem 0.5rem
     font-size: 20px
 
   .title
     color: #777
     margin: 0.5rem 1rem
     font-size: 1.1em
+    line-height 1em
 
 .modal
   z-index 2
@@ -277,7 +285,7 @@ $max-width = 85rem
       left 50%
       top 50%
       height 175px
-      width 250px
+      width 280px
       background white
       padding 20px
       transform translate(-50%, -50%)

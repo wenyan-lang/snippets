@@ -51,7 +51,7 @@ export default {
       return this.snippet.token === 'public'
         ? 'earth'
         : this.snippet.token === this.userToken
-          ? 'unlocked'
+          ? 'account'
           : 'lock'
     }
   },
@@ -59,14 +59,16 @@ export default {
     async voteUp() {
       const data = await API.vote(
         this.snippet.id, 
-        this.snippet.voted === 1 ? 'reset' : 'up'
+        this.snippet.voted === 1 ? 'reset' : 'up',
+        this.userToken,
       )
       this.update(data)
     },
     async voteDown() {
        const data = await API.vote(
         this.snippet.id, 
-        this.snippet.voted === -1 ? 'reset' : 'down'
+        this.snippet.voted === -1 ? 'reset' : 'down',
+        this.userToken,
       )
       this.update(data)
     },
