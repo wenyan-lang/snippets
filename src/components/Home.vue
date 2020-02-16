@@ -2,7 +2,7 @@
 <div class="home">
   <div class="nav">
     <div class="nav-inner">
-      <label class="title" @click='$router.push("/")'>文言片語</label>
+      <label class="title" @click='goHome'>文言片語</label>
 
       <input 
         v-model="searchText"
@@ -15,7 +15,7 @@
       <icon-button v-show="!searchResult" @click="search()" icon="search"/>
 
       <div class="right-aligned">
-        <icon-button @click="newSnippet" icon="plus"/>
+        <icon-button @click="newSnippet" v-show='!routed' icon="plus"/>
         <icon-button @click="showProfile = !showProfile" icon="account"/>
       </div>
     </div>
@@ -185,7 +185,7 @@ export default {
     },
     notify(data) {
       this.$refs.notify.show(data)
-    }
+    },
   },
   mounted() {
     this.page = 0
@@ -220,7 +220,7 @@ $max-width = 85rem
   grid-template-rows max-content 1fr
 
   & > .content
-    height 100%
+    height calc(100vh - 50px)
     overflow auto
 
   .showcase
@@ -270,7 +270,7 @@ $max-width = 85rem
 
   .title
     color: #777
-    margin: 0.5rem 1rem
+    margin: 0.5rem
     font-size: 1.1em
     line-height 1em
 

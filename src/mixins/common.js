@@ -48,6 +48,10 @@ export const CommonMixin = {
         return cache
       
       return await API.get(id, this.userToken)
-    }
+    },
+    goHome() {
+      if (this.$route.path !== '/')
+        this.$router.push("/")
+    },
   }
 }

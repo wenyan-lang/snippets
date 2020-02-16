@@ -63,10 +63,15 @@ export default {
             title: 'Untitled',
             code: '',
           }
-          if (this.draft && confirm(`Unsaved draft "${this.draft.title}", do you want to load it?`)) {
-            this.snapshot.title = this.draft.title
-            this.snapshot.code = this.draft.code
-            this.snapshot.token = this.draft.token
+          if (this.draft) {
+            if (confirm(`Unsaved draft "${this.draft.title}" found.\nClick "OK" to load it or "Cancel" to discard it.`)){
+              this.snapshot.title = this.draft.title
+              this.snapshot.code = this.draft.code
+              this.snapshot.token = this.draft.token
+            }
+            else {
+              this.draft = null
+            }
           }
         }
       }
@@ -250,6 +255,8 @@ export default {
           },
         },
       })
+      this.$emit('close')
+      this.$emit('notify', { message: 'Fork created', type: 'success' })
     }
   },
   computed: {
