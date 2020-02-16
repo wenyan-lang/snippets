@@ -122,6 +122,9 @@ export default {
       this.totalPages = totalPages
       this.page = page
       this.loading = false
+
+      if (this.$refs.content.offsetHeight === this.$refs.content.clientHeight)
+        this.fetchNext()
     },
     async search() {
       if (!this.searchText) {
