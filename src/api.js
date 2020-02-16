@@ -19,7 +19,24 @@ export class API {
   }
 
   static async search(str, token) {
-    const res = await axios.post(`${API_ROOT}/search`, { keywords: str.split(' '), token })
+    const query = {
+      keywords: [],
+    }
+    const sections = str.split(' ')
+    for (const s of sections){
+      if (s.includes(':')) {
+        const [key, value] = s.split(':', 2)
+        if (['author', 'tag'].includes(key))
+          query[key] = value
+        else if (key === 'is' && value === 'mine')
+          query.token = token
+      }
+      else {
+        query.keywords.push(s)
+      }
+    }
+
+    const res = await axios.post(`${API_ROOT}/search`, { query, token })
     return res.data
   }
   

@@ -3,13 +3,17 @@
   <div class="nav">
     <div class="nav-inner">
       <label class="title" @click='$router.push("/")'>文言片語</label>
+
       <input 
         v-model="searchText"
-        @keypress.enter="search"
+        @keypress.enter="search()"
         class="search" 
         placeholder="Search snippets..." 
       />
-      <icon-button @click="search" icon="search"/>
+
+      <icon-button v-show="searchResult" @click="searchText = ''" icon="close"/>
+      <icon-button v-show="!searchResult" @click="search()" icon="search"/>
+
       <div class="right-aligned">
         <icon-button @click="newSnippet" icon="plus"/>
         <icon-button @click="showProfile = !showProfile" icon="account"/>
@@ -17,12 +21,12 @@
     </div>
   </div>
   <div class="content" ref='content'>
-    <template v-if="$route.path !== '/'">
-      <router-view
-        @notify='notify'
-      />
-    </template>
-    <template v-else>
+    <router-view
+      v-if="routed" 
+      v-show="!searchResult"
+      @notify='notify'
+    />
+    <template v-if="!routed || searchResult">
       <div class="showcase">
         <snippet-preview 
           v-for="(s, idx) in (searchResult || snippets)" 
@@ -60,7 +64,8 @@
         <span class="iconify" data-icon="mdi:refresh" data-inline="false"></span>
       </button>
       <br>
-      <button @click='showProfile = false'>OK</button>
+      <button @click='search(`is:mine`);showProfile = false'>My Snippets</button>
+      <button @click='showProfile = false'>Close</button>
     </div>
   </div>
   <notification ref='notify'/> 
@@ -116,6 +121,7 @@ export default {
     async fetchNext() {
       if (this.endOfPages || this.loading || this.routed)
         return
+  
       this.loading = true
       const { snippets, totalPages, page } = await API.getPage(this.page + 1, this.userToken)
       this.snippets.push(...snippets)
@@ -123,10 +129,14 @@ export default {
       this.page = page
       this.loading = false
 
-      if (this.$refs.content.offsetHeight === this.$refs.content.clientHeight)
-        this.fetchNext()
+      this.$nextTick(() => {
+        if (this.$refs.content.scrollHeight === this.$refs.content.clientHeight)
+          this.fetchNext()
+      })
     },
-    async search() {
+    async search(v) {
+      if (v)
+        this.searchText = v
       if (!this.searchText) {
         this.searchResult = null
         return
@@ -306,9 +316,9 @@ $max-width = 85rem
     margin 0.4rem 0
 
   button:not(.icon)
-    margin 0.8rem 0
+    margin 0.8rem 0.4rem 0.8rem 0
     font-size 0.8em
-    padding 4px
+    padding 0.2rem 0.6rem
   
   button.icon
     margin-left 0.4rem

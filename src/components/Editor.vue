@@ -18,7 +18,7 @@ export default {
     CommonMixin
   ],
   props: {
-    id: String,
+    id: [String, Number],
     snippet: Object,
     inDialog: Boolean,
     error: null
@@ -45,7 +45,7 @@ export default {
       else {
         if (this.id) {
           try {
-            this.snippet = await this.getSnippet(this.id)
+            this.snippet = await this.getSnippet(this.id.toString())
             this.snapshot = { ...this.snippet }
           }
           catch(error) {
