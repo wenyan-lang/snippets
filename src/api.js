@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-export const API_ROOT = 'https://wenyan-snippets.glitch.me'
+export const API_ROOT = 'https://wys.glitch.me'
 
 export class API {
   static async get(id, token) {
