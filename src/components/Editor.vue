@@ -1,7 +1,8 @@
 <template>
 <div class="editor">
   <spinner v-if="loading"/>
-  <iframe src="https://ide.wy-lang.org/embed?show-bars" ref="iframe"/>
+  <error-page :error="error" v-if="error"/>
+  <iframe v-show="!error" src="https://ide.wy-lang.org/embed?show-bars" ref="iframe"/>
 </div>
 </template>
 
@@ -9,6 +10,7 @@
 import { API } from '../api'
 import { CommonMixin } from '../mixins/common'
 import Spinner from './Spinner.vue'
+import ErrorPage from './ErrorPage.vue'
 
 export default {
   name: 'Editor',
@@ -19,6 +21,7 @@ export default {
     id: String,
     snippet: Object,
     inDialog: Boolean,
+    error: null
   },
   data() {
     return {
@@ -29,6 +32,7 @@ export default {
   },
   components: {
     Spinner,
+    ErrorPage,
   },
   methods: {
     send(data) {
@@ -44,6 +48,8 @@ export default {
             this.snapshot = await this.getSnippet(this.id)
           }
           catch(error) {
+            this.loading = false
+            this.error = error
             this.$emit('notify', { error })
           }
         }
