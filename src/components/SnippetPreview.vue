@@ -16,8 +16,8 @@
   <div class='footer'>
     <span class='votes'>{{snippet.votes}}</span>
 
-    <icon-button @click.native="voteUp" :class='{active: snippet.voted === 1}' icon="thumb-up"/>
-    <icon-button @click.native="voteDown" :class='{active: snippet.voted === -1}' icon="thumb-down"/>
+    <icon-button class="vote-button up" @click.native="voteUp" :class='{active: snippet.voted === 1}' icon="ant-design:caret-up-filled"/>
+    <icon-button class="vote-button down" @click.native="voteDown" :class='{active: snippet.voted === -1}' icon="ant-design:caret-down-filled"/>
 
     <div class='right-aligned'>
       <icon-button disabled :icon="permissionIcon"/>
@@ -159,4 +159,10 @@ export default {
     overflow: hidden
     padding: 5px
     margin: 0px
+
+.vote-button:not(.active)
+  opacity 0.4
+
+.vote-button.down.active
+  color #248
 </style>
