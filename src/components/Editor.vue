@@ -79,7 +79,11 @@ export default {
     async initEditor() {
       await this.initSnapshot()
       const load = () => {
-        this.updateControls()
+        this.send({ 
+          action: 'custom', 
+          field: 'set',
+          value: this.controls,
+        })
         this.send({ action: 'title', value: this.snapshot.title })
         this.send({ action: 'author', value: this.snapshot.author })
         this.send({ action: 'code', value: this.snapshot.code })
@@ -93,7 +97,123 @@ export default {
       else
         this.$refs.iframe.onload = load
     },
-    updateControls() {
+    registerListener () {
+      window.addEventListener('message', this.onListener)
+    },
+    unregisterListener(){
+      window.removeEventListener('message', this.onListener)
+    },
+    toggleLock() {
+      if (this.snapshot.token === 'public') 
+        this.snapshot.token = this.$store.state.user.token
+      else
+        this.snapshot.token = 'public'
+    },
+    onChanged(snap){
+      this.snapshot.code = snap.code
+      this.snapshot.title = snap.name
+      this.snapshot.author = snap.author
+      if (this.new) {
+        if (snap.code)
+          this.draft = this.snapshot
+        else
+          this.draft = ''
+      }
+    },
+    onListener(e) {
+      const { action, source, id, value } = e.data
+      if (source !== 'wenyan-ide')
+        return
+      if (action === 'info') {
+        this.onChanged(value)
+      }
+      else if (action === 'save') {
+        if (this.new)
+          this.publish()
+        else
+          this.save()
+      }
+      else if (action === 'custom') {
+        switch (id){
+          case 'open-in-editor':
+            this.gotoSnippet(this.snapshot.id, this.snapshot)
+            this.$emit('close')
+            break
+          case 'lock':
+            this.toggleLock()
+            break
+          case 'share':
+            prompt('Copy the following link', `${window.location.origin}/snippet/${this.snapshot.id}`)
+            break
+          case 'publish':
+            this.publish()
+            break
+          case 'save':
+            this.save()
+            break
+          case 'fork':
+            this.fork()
+            break
+          case 'close':
+            this.$emit('close')
+            break
+        }
+      }
+    },
+    async publish() {
+      if (!confirm(`Publishing this script?\n\nTitle: ${this.snapshot.title}\nAuthor: ${this.snapshot.author}\nToken: ${this.snapshot.token}`))
+        return
+      
+      try {
+        const { id } = await API.publish(this.snapshot)
+        this.draft = null
+        this.$emit('notify', { message: 'Snippet published!', type: 'success' })
+        this.gotoSnippet(id.toString())
+      } catch (error) {
+        this.$emit('notify', { error })
+      }
+    },
+    async save() {
+      try {
+        await API.modify(this.snapshot.id, this.snapshot)
+        this.$set(this, 'snippet', { ...this.snapshot })
+        this.$emit('notify', { message: 'Saved', type: 'success' })
+        this.setSnippetCache(this.snapshot)
+      } catch (error) {
+        this.$emit('notify', { error })
+      }
+    },
+    async fork() {
+      this.$router.push({
+        name: 'new', 
+        params: {
+          id: null,
+          snippet: {
+            ...this.snapshot,
+            id: undefined, 
+            origin: this.snapshot.id,
+            author: this.userName,
+          },
+        },
+      })
+      this.$emit('close')
+      this.$emit('notify', { message: 'Fork created', type: 'success' })
+    }
+  },
+  computed: {
+    public() {
+      return this.snapshot.token === 'public'
+    },
+    new() {
+      return this.snapshot.id == null
+    },
+    unsaved () {
+      return !this.snippet
+        || this.snippet.code !== this.snapshot.code
+        || this.snippet.title !== this.snapshot.title
+        || this.snippet.author !== this.snapshot.author
+    },
+    controls () {
       const controls = []
 
       if (this.new) {
@@ -147,135 +267,19 @@ export default {
         })
       }
 
-      this.send({ 
-        action: 'custom', 
-        field: 'set',
-        value: controls,
-      })
-    },
-    registerListener () {
-      window.addEventListener('message', this.onListener)
-    },
-    unregisterListener(){
-      window.removeEventListener('message', this.onListener)
-    },
-    toggleLock() {
-      if (this.snapshot.token === 'public') 
-        this.snapshot.token = this.$store.state.user.token
-      else
-        this.snapshot.token = 'public'
-    },
-    onChanged(snap){
-      this.snapshot.code = snap.code
-      this.snapshot.title = snap.name
-      this.snapshot.author = snap.author
-      if (this.new) {
-        if (snap.code)
-          this.draft = this.snapshot
-        else
-          this.draft = ''
-      }
-      this.updateControls()
-    },
-    onListener(e) {
-      const { action, source, id, value } = e.data
-      if (source !== 'wenyan-ide')
-        return
-      if (action === 'info') {
-        this.onChanged(value)
-      }
-      else if (action === 'save') {
-        if (this.new)
-          this.publish()
-        else
-          this.save()
-      }
-      else if (action === 'custom') {
-        switch (id){
-          case 'open-in-editor':
-            this.gotoSnippet(this.snapshot.id, this.snapshot)
-            this.$emit('close')
-            break
-          case 'lock':
-            this.toggleLock()
-            this.updateControls()
-            break
-          case 'share':
-            prompt('Copy the following link', `${window.location.origin}/snippet/${this.snapshot.id}`)
-            break
-          case 'publish':
-            this.publish()
-            break
-          case 'save':
-            this.save()
-            break
-          case 'fork':
-            this.fork()
-            break
-          case 'close':
-            this.$emit('close')
-            break
-        }
-      }
-    },
-    async publish() {
-      if (!confirm(`Publishing this script?\n\nTitle: ${this.snapshot.title}\nAuthor: ${this.snapshot.author}\nToken: ${this.snapshot.token}`))
-        return
-      
-      try {
-        const { id } = await API.publish(this.snapshot)
-        this.draft = null
-        this.$emit('notify', { message: 'Snippet published!', type: 'success' })
-        this.gotoSnippet(id.toString())
-      } catch (error) {
-        this.$emit('notify', { error })
-      }
-    },
-    async save() {
-      try {
-        await API.modify(this.snapshot.id, this.snapshot)
-        this.$set(this, 'snippet', { ...this.snapshot })
-        this.$emit('notify', { message: 'Saved', type: 'success' })
-        this.setSnippetCache(this.snapshot)
-      } catch (error) {
-        this.$emit('notify', { error })
-      }
-      this.updateControls()
-    },
-    async fork() {
-      this.$router.push({
-        name: 'new', 
-        params: {
-          id: null,
-          snippet: {
-            ...this.snapshot,
-            id: undefined, 
-            origin: this.snapshot.id,
-            author: this.userName,
-          },
-        },
-      })
-      this.$emit('close')
-      this.$emit('notify', { message: 'Fork created', type: 'success' })
-    }
-  },
-  computed: {
-    public() {
-      return this.snapshot.token === 'public'
-    },
-    new() {
-      return this.snapshot.id == null
-    },
-    unsaved () {
-      return !this.snippet
-        || this.snippet.code !== this.snapshot.code
-        || this.snippet.title !== this.snapshot.title
-        || this.snippet.author !== this.snapshot.author
+      return controls
     }
   },
   watch: {
     snippet() {
       this.initEditor()
+    },
+    controls() {
+      this.send({ 
+        action: 'custom', 
+        field: 'set',
+        value: this.controls,
+      })
     }
   },
   mounted() {
