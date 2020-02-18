@@ -2,6 +2,8 @@
 <div class="home">
   <div class="nav">
     <div class="nav-inner">
+      <icon-button v-show="routed" @click="goHome" icon="arrow-left"/>
+
       <label class="title" @click='goHome'>文言片語</label>
 
       <input 
@@ -53,6 +55,7 @@
   </div>
   <div class="modal" v-if="showProfile" >
     <div class="profile dialog" @click.prevent=''>
+      <div class="title">Settings</div>
       <label>Username</label>
       <input v-model='userName' placeholder="Username"/>
       <label>Token</label>
@@ -63,7 +66,7 @@
       <button class="icon" @click='resetToken'>
         <span class="iconify" data-icon="mdi:refresh" data-inline="false"></span>
       </button>
-      <br>
+      <div class="description">Token is your account credential, be sure to have a backup elsewhere to prevent losing the access to your snippets.</div>
       <button @click='search(`is:mine`);showProfile = false'>My Snippets</button>
       <button @click='showProfile = false'>Close</button>
     </div>
@@ -161,7 +164,7 @@ export default {
       this.searchText = ''
     },
     promptChangeToken(){
-      return confirm('Token is like the password to snippets. If you changed your token, you will LOSE the control of your snippets you created before. \n\nAre you sure to change it?')
+      return confirm('Token is your account credential. If you changed it, you will LOSE the control of the snippets you created. \n\nAre you sure to change it?')
     },
     enterToken() {
       if (!this.promptChangeToken())
@@ -297,7 +300,7 @@ $max-width = 85rem
     &.profile
       left 50%
       top 50%
-      height 175px
+      height 250px
       width 280px
       background white
       padding 20px
@@ -307,9 +310,22 @@ $max-width = 85rem
   & > *
     vertical-align middle
 
+  .title
+    font-size 1.3em
+    padding-bottom 10px
+
   label
     display block
     margin 0.6rem 0 0 0
+    opacity 0.8
+    font-size 0.9em
+
+  .description
+    opacity 0.6
+    font-size 0.75em
+    padding 0 5px
+    font-style italic 
+    padding-bottom 10px
   
   input
     font-size 1em
