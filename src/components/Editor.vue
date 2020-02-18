@@ -174,13 +174,23 @@ export default {
       }
     },
     async save() {
-      try {
-        await API.modify(this.snapshot.id, this.snapshot)
-        this.$set(this, 'snippet', { ...this.snapshot })
-        this.$emit('notify', { message: 'Saved', type: 'success' })
-        this.setSnippetCache(this.snapshot)
-      } catch (error) {
-        this.$emit('notify', { error })
+      // others' snippets
+      if (this.locked) {
+        const options = confirm("You don't have access to this snippet, would you like to make a fork or enter the token to access?")
+        // TODO
+        options
+        alert('WIP!')
+      }
+      // your own snippets
+      else {
+        try {
+          await API.modify(this.snapshot.id, this.snapshot)
+          this.$set(this, 'snippet', { ...this.snapshot })
+          this.$emit('notify', { message: 'Saved', type: 'success' })
+          this.setSnippetCache(this.snapshot)
+        } catch (error) {
+          this.$emit('notify', { error })
+        }
       }
     },
     async fork() {

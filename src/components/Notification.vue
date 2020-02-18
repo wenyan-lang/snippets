@@ -36,7 +36,15 @@ export default {
 
       if (error) {
         type = 'error'
-        message += error.message
+        if (!message){
+          let code = (error.response || {}).status || null
+          if (code === 404)
+            message = 'Not found'
+          else if (code === 403)
+            message = 'Unauthorized'
+          else
+            message += error.message
+        }
       }
 
       this.data = {
@@ -57,6 +65,7 @@ export default {
 <style lang="stylus" scoped>
 .notification
   position fixed
+  z-index 1000
   right 1.5rem
   bottom 1.5rem
   width 18rem
@@ -64,7 +73,6 @@ export default {
   border-radius 3px
   padding 1rem 1.5rem
   overflow hidden
-  border 1px solid gainsboro
   box-shadow 2px 2px 10px 0px rgba(50, 50, 50, 0.2)
   transform translateX(30rem)
   transition all .2s ease-in-out
