@@ -17,8 +17,8 @@ export default {
     }
   },
   methods: {
-    exit() {
-      if (!this.persist)
+    exit(e) {
+      if (e.target === this.$el)
         this.$emit('input', false)
     }
   },

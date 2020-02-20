@@ -37,6 +37,7 @@
           @update="data=>updateSnippet(idx, data)"
           @open="()=>{ editing = true; editingSnippet = s }"
           @notify='notify'
+          @comments='commentId = s.id'
         />
       </div>
       <spinner v-show="loading"/>
@@ -49,6 +50,7 @@
       :in-dialog="true"
       @close='editing = false'
       @notify='notify'
+      @comments='commentId = editing.id'
     />
   </modal>
   <modal v-model="showProfile" class="profile">
@@ -66,6 +68,9 @@
     <div class="description">Token is your account credential, be sure to have a backup elsewhere to prevent losing the access to your snippets.</div>
     <button @click='search(`is:mine`);showProfile = false'>My Snippets</button>
     <button @click='showProfile = false'>Close</button>
+  </modal>
+  <modal class="comments" :value='!!commentId' @input='commentId = null' v-if='commentId'>
+    <vue-disqus shortname="wenyan-snippets" :identifier="commentId.toString()" :url="'http://snippets.wy-lang.org/snippets/'+commentId"></vue-disqus>
   </modal>
   <notification ref='notify'/> 
 </div>
@@ -107,6 +112,7 @@ export default {
       editingSnippet: null,
       editingFullscreen: false,
       showProfile: false,
+      commentId: null
     }
   },
   computed: {
@@ -285,6 +291,17 @@ $max-width = 85rem
     height 250px
     width 280px
     padding 20px
+
+.modal.comments
+  .dialog
+    min-height min(20rem, 100vh)
+    max-height calc(100vh - 10rem)
+    min-width min(30rem, 100vw)
+    width calc(100vw - 20rem)
+    overflow auto
+
+    #disqus_thread
+      padding 2rem
 
 .profile
   & > *

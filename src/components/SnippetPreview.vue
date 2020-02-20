@@ -20,7 +20,8 @@
     <icon-button class="vote-button down" @click.native="voteDown" :class='{active: snippet.voted === -1}' icon="ant-design:caret-down-filled"/>
 
     <div class='right-aligned'>
-      <icon-button disabled :icon="permissionIcon"/>
+      <icon-button @click.native="openComments" icon="comment-multiple-outline"/>
+      <icon-button :icon="permissionIcon"/>
     </div>
   </div>
 </div>
@@ -85,6 +86,9 @@ export default {
     open() {
       this.gotoSnippet(this.snippet.id, this.snippet)
     },
+    openComments() {
+      this.$emit('comments', this.snippet.id)
+    }
   },
   mounted(){
     this.highlight()
