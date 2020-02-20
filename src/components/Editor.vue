@@ -107,12 +107,6 @@ export default {
     unregisterListener(){
       window.removeEventListener('message', this.onListener)
     },
-    toggleLock() {
-      if (this.snapshot.token === 'public') 
-        this.snapshot.token = this.$store.state.user.token
-      else
-        this.snapshot.token = 'public'
-    },
     onChanged(snap){
       this.snapshot.code = snap.code
       this.snapshot.title = snap.name
@@ -294,18 +288,18 @@ export default {
         })
       }
 
-      controls.push({
-        id: 'lock',
-        icon: this.public
-          ? 'earth'
-          : this.locked 
-            ? 'lock-outline'
-            : 'lock-open-variant-outline',
-        align: 'right',
-        disabled: !this.new,
-      })
-
       if (!this.new) {
+        controls.push({
+          id: 'lock',
+          icon: this.public
+            ? 'earth'
+            : this.locked 
+              ? 'lock-outline'
+              : 'lock-open-variant-outline',
+          align: 'right',
+          disabled: true,
+        })
+
         controls.push({
           id: 'share',
           icon: 'link-variant',
