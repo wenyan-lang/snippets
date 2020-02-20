@@ -3,6 +3,7 @@
   <spinner v-if="loading"/>
   <error-page :error="error" v-if="error"/>
   <iframe v-show="!error" src="https://ide.wy-lang.org/embed?show-bars" ref="iframe"/>
+  <confirm ref='confirm'/>
 </div>
 </template>
 
@@ -11,6 +12,7 @@ import { API } from '../api'
 import { CommonMixin } from '../mixins/common'
 import Spinner from './Spinner.vue'
 import ErrorPage from './ErrorPage.vue'
+import Confirm from './Confirm.vue'
 
 export default {
   name: 'Editor',
@@ -26,7 +28,6 @@ export default {
   data() {
     return {
       loading: true,
-      unlocked: false,
       snapshot: {},
       iframeLoaded: false,
     }
@@ -34,6 +35,7 @@ export default {
   components: {
     Spinner,
     ErrorPage,
+    Confirm,
   },
   methods: {
     send(data) {
@@ -87,7 +89,7 @@ export default {
         this.send({ action: 'title', value: this.snapshot.title })
         this.send({ action: 'author', value: this.snapshot.author })
         this.send({ action: 'code', value: this.snapshot.code })
-        this.send({ action: 'config', field: 'readonly', value: this.locked })
+        // this.send({ action: 'config', field: 'readonly', value: this.locked })
         this.send({ action: 'run' })
         this.loading = false
         this.iframeLoaded = true
@@ -160,12 +162,12 @@ export default {
         }
       }
     },
-    async publish() {
-      if (!confirm(`Publishing this script?\n\nTitle: ${this.snapshot.title}\nAuthor: ${this.snapshot.author}\nToken: ${this.snapshot.token}`))
+    async publish(data = this.snapshot) {
+      if (!confirm(`Publishing this script?\n\nTitle: ${data.title}\nAuthor: ${data.author}\nToken: ${data.token}`))
         return
       
       try {
-        const { id } = await API.publish(this.snapshot)
+        const { id } = await API.publish(data)
         this.draft = null
         this.$emit('notify', { message: 'Snippet published!', type: 'success' })
         this.gotoSnippet(id.toString())
@@ -174,23 +176,45 @@ export default {
       }
     },
     async save() {
-      // others' snippets
-      if (this.locked) {
-        const options = confirm("You don't have access to this snippet, would you like to make a fork or enter the token to access?")
-        // TODO
-        options
-        alert('WIP!')
-      }
-      // your own snippets
-      else {
+      const modify = async (snapshot) => {
         try {
-          await API.modify(this.snapshot.id, this.snapshot)
-          this.$set(this, 'snippet', { ...this.snapshot })
+          await API.modify(snapshot.id, snapshot)
+          this.$set(this, 'snippet', { ...snapshot })
           this.$emit('notify', { message: 'Saved', type: 'success' })
-          this.setSnippetCache(this.snapshot)
+          this.setSnippetCache(snapshot)
         } catch (error) {
           this.$emit('notify', { error })
         }
+      }
+      // others' snippets
+      if (this.locked) {
+        const result = await this.$refs.confirm.open({
+          title: 'No Access',
+          message: "You don't have access to this snippet, would you like to make a fork or enter the token to access?",
+          buttons: [
+            'Fork',
+            'Enter Token',
+            'Cancel'
+          ]
+        })
+        // fork
+        if (result === 0) {
+          await this.publish(this.makeFork())
+        }
+        // enter token
+        else if (result === 1) {
+          const token = prompt('Enter token for this snippet')
+          // TODO: save token for this snippet to local storage
+          await modify({...this.snapshot, token })
+        }
+        // cancel
+        else {
+          return
+        }
+      }
+      // your own snippets
+      else {
+        await modify(this.snapshot)
       }
     },
     async fork() {
@@ -198,21 +222,27 @@ export default {
         name: 'new', 
         params: {
           id: null,
-          snippet: {
-            ...this.snapshot,
-            id: undefined, 
-            origin: this.snapshot.id,
-            author: this.userName,
-          },
+          snippet: this.makeFork()
         },
       })
       this.$emit('close')
       this.$emit('notify', { message: 'Fork created', type: 'success' })
+    },
+    makeFork() {
+      return {
+        ...this.snapshot,
+        id: undefined, 
+        origin: this.snapshot.id,
+        author: this.userName,
+      }
     }
   },
   computed: {
     public() {
       return this.snapshot.token === 'public'
+    },
+    locked() {
+      return !this.public && this.snapshot.token !== this.userToken
     },
     new() {
       return this.snapshot.id == null
@@ -242,9 +272,9 @@ export default {
         id: 'lock',
         icon: this.public
           ? 'earth'
-          : this.unlocked 
-            ? 'lock-open-variant-outline'
-            : 'lock-outline',
+          : this.locked 
+            ? 'lock-outline'
+            : 'lock-open-variant-outline',
         align: 'right',
         disabled: !this.new,
       })

@@ -43,34 +43,30 @@
       <div class="end-of-pages" v-if='endOfPages'>you reached the end :)</div>
     </template>
   </div>
-  <div class="modal" v-if="editing">
-    <div class="editor dialog">
-      <editor 
-        :snippet="editingSnippet || undefined"
-        :in-dialog="true"
-        @close='editing = false'
-        @notify='notify'
-      />
-    </div>
-  </div>
-  <div class="modal" v-if="showProfile" >
-    <div class="profile dialog" @click.prevent=''>
-      <div class="title">Settings</div>
-      <label>Username</label>
-      <input v-model='userName' placeholder="Username"/>
-      <label>Token</label>
-      <input v-model='userToken' disabled placeholder="Token"/>
-      <button class="icon" @click='enterToken'>
-        <span class="iconify" data-icon="mdi:cursor-text" data-inline="false"></span>
-      </button>
-      <button class="icon" @click='resetToken'>
-        <span class="iconify" data-icon="mdi:refresh" data-inline="false"></span>
-      </button>
-      <div class="description">Token is your account credential, be sure to have a backup elsewhere to prevent losing the access to your snippets.</div>
-      <button @click='search(`is:mine`);showProfile = false'>My Snippets</button>
-      <button @click='showProfile = false'>Close</button>
-    </div>
-  </div>
+  <modal v-model="editing" class="editor">
+    <editor 
+      :snippet="editingSnippet || undefined"
+      :in-dialog="true"
+      @close='editing = false'
+      @notify='notify'
+    />
+  </modal>
+  <modal v-model="showProfile" class="profile">
+    <div class="title">Settings</div>
+    <label>Username</label>
+    <input v-model='userName' placeholder="Username"/>
+    <label>Token</label>
+    <input v-model='userToken' disabled placeholder="Token"/>
+    <button class="icon" @click='enterToken'>
+      <span class="iconify" data-icon="mdi:cursor-text" data-inline="false"></span>
+    </button>
+    <button class="icon" @click='resetToken'>
+      <span class="iconify" data-icon="mdi:refresh" data-inline="false"></span>
+    </button>
+    <div class="description">Token is your account credential, be sure to have a backup elsewhere to prevent losing the access to your snippets.</div>
+    <button @click='search(`is:mine`);showProfile = false'>My Snippets</button>
+    <button @click='showProfile = false'>Close</button>
+  </modal>
   <notification ref='notify'/> 
 </div>
 </template>
@@ -84,6 +80,7 @@ import Spinner from './Spinner.vue'
 import IconButton from './IconButton.vue'
 import Editor from './Editor.vue'
 import Notification from './Notification.vue'
+import Modal from './Modal.vue'
 
 export default {
   name: 'Home',
@@ -96,6 +93,7 @@ export default {
     Editor,
     IconButton,
     Notification,
+    Modal,
   },
   data() {
     return {
@@ -277,34 +275,16 @@ $max-width = 85rem
     font-size: 1.1em
     line-height 1em
 
-.modal
-  z-index 2
-  position fixed
-  left 0
-  top 0
-  bottom 0
-  right 0
-  background rgba(0,0,0,0.6)
-  
+.modal.editor
   .dialog
-    position absolute
-    border-radius 5px
-    overflow hidden
+    height calc(100vh - 10rem)
+    width calc(100vw - 10rem)
 
-    &.editor
-      left 5rem
-      top 5rem
-      bottom 5rem
-      right 5rem
-
-    &.profile
-      left 50%
-      top 50%
-      height 250px
-      width 280px
-      background white
-      padding 20px
-      transform translate(-50%, -50%)
+.modal.profile
+  .dialog
+    height 250px
+    width 280px
+    padding 20px
 
 .profile
   & > *
