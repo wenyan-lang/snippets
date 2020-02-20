@@ -39,6 +39,15 @@ export class API {
     const res = await axios.post(`${API_ROOT}/search`, { query, token })
     return res.data
   }
+
+  static async delete(id, token) {
+    const res = await axios.delete(`${API_ROOT}/snippets/${id}`, { 
+      headers: {
+        Authorization: token
+      }
+    })
+    return res.data
+  }
   
   static async vote(id, v, token) {
     const res = await axios.get(`${API_ROOT}/snippets/${id}/vote/${v}`, { params: { token }})

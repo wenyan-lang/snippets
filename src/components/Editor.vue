@@ -30,6 +30,7 @@ export default {
       loading: true,
       snapshot: {},
       iframeLoaded: false,
+      customToken: null,
     }
   },
   components: {
@@ -100,6 +101,7 @@ export default {
         this.$refs.iframe.onload = load
     },
     registerListener () {
+      this.unregisterListener()
       window.addEventListener('message', this.onListener)
     },
     unregisterListener(){
@@ -156,6 +158,9 @@ export default {
           case 'fork':
             this.fork()
             break
+          case 'delete':
+            this.remove()
+            break
           case 'close':
             this.$emit('close')
             break
@@ -182,8 +187,10 @@ export default {
           this.$set(this, 'snippet', { ...snapshot })
           this.$emit('notify', { message: 'Saved', type: 'success' })
           this.setSnippetCache(snapshot)
+          return true
         } catch (error) {
           this.$emit('notify', { error })
+          return false
         }
       }
       // others' snippets
@@ -205,7 +212,8 @@ export default {
         else if (result === 1) {
           const token = prompt('Enter token for this snippet')
           // TODO: save token for this snippet to local storage
-          await modify({...this.snapshot, token })
+          if (await modify({...this.snapshot, token }))
+            this.customToken = token
         }
         // cancel
         else {
@@ -235,6 +243,21 @@ export default {
         origin: this.snapshot.id,
         author: this.userName,
       }
+    },
+    async remove() {
+      if (!this.snapshot.id)
+        return
+      const result = confirm('Are you sure to delete this snippet?\nThis operation can NOT be undone.')
+      if (!result)
+        return
+
+      try {
+        await API.delete(this.snapshot.id, this.currentToken)
+        this.$emit('notify', { message: 'Deleted', type: 'success' })
+        this.goHome()
+      } catch (error) {
+        this.$emit('notify', { error })
+      }
     }
   },
   computed: {
@@ -242,10 +265,13 @@ export default {
       return this.snapshot.token === 'public'
     },
     locked() {
-      return !this.public && this.snapshot.token !== this.userToken
+      return !this.public && this.snapshot.token !== this.currentToken
     },
     new() {
       return this.snapshot.id == null
+    },
+    currentToken() {
+      return this.customToken || this.snapshot.token || this.userToken
     },
     unsaved () {
       return !this.snippet
@@ -291,6 +317,15 @@ export default {
           icon: 'source-fork',
           align: 'right'
         })
+
+
+        if (!this.locked) {
+          controls.push({
+            id: 'delete',
+            icon: 'delete-outline',
+            align: 'right'
+          })
+        }
       }
 
       if (this.inDialog) {
