@@ -21,6 +21,11 @@
 
     <div class='right-aligned'>
       <icon-button @click.native="openComments" icon="comment-multiple-outline"/>
+      <disqus-count 
+        class='counts'
+        shortname='wenyan-snippets' 
+        :identifier='snippet.id.toString()'
+      >0</disqus-count>
       <icon-button disabled :icon="permissionIcon"/>
     </div>
   </div>
@@ -30,6 +35,7 @@
 <script>
 import { API } from '../api'
 import IconButton from './IconButton.vue'
+import DisqusCount from './DisqusCount.vue'
 import { CommonMixin } from '../mixins/common'
 
 export default {
@@ -39,6 +45,7 @@ export default {
   ],
   components: {
     IconButton,
+    DisqusCount,
   },
   data() {
     return {
@@ -125,6 +132,9 @@ export default {
       top 0
       padding 5px
 
+      & > *
+        vertical-align middle
+
       & > span
         line-height 20px
 
@@ -152,6 +162,9 @@ export default {
     .votes
       padding 0 0.3rem
       font-weight bold
+
+    .counts
+      padding 0 0.5rem 0 0.1rem
 
     .token
       text-transform uppercase
