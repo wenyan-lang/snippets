@@ -1,20 +1,30 @@
 <template>
 <div class="home">
-  <div class="nav">
+  <div class="nav" :class='{routed}'>
     <div class="nav-inner">
-      <icon-button v-show="routed" @click="goHome" icon="arrow-left"/>
-
+      <icon-button v-if="routed" @click="goHome" icon="arrow-left"/>
       <label class="title" @click='goHome'>文言片語</label>
 
       <input 
+        :class='{invisible: routed}'
         v-model="searchText"
         @keypress.enter="search()"
-        class="search" 
+        class="search"
         placeholder="Search snippets..." 
       />
 
-      <icon-button v-show="searchResult" @click="searchText = ''" icon="close"/>
-      <icon-button v-show="!searchResult" @click="search()" icon="search"/>
+      <icon-button 
+        v-show="searchResult" 
+        :class='{invisible: routed}'
+        @click="searchText = ''" 
+        icon="close"
+      />
+      <icon-button 
+        v-show="!searchResult" 
+        :class='{invisible: routed}'
+        @click="search()" 
+        icon="search"
+      />
 
       <div class="right-aligned">
         <icon-button @click="newSnippet" v-show='!routed' icon="plus"/>
@@ -235,13 +245,18 @@ $max-width = 85rem
     padding: 1rem
     display: grid
     grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr))
-    max-width $max-width
+    max-width $max-width - 2rem
     margin 0.5rem auto
 
 .nav
   background: #f1f1f1
   border-bottom: 1px solid gainsboro
   white-space: nowrap
+
+  &.routed
+    .nav-inner
+      max-width 100vw
+      width 100%
 
   .nav-inner
     max-width $max-width
@@ -342,4 +357,7 @@ $max-width = 85rem
   opacity 0.3
   text-align center
   font-style italic
+
+.invisible
+  visibility hidden
 </style>
