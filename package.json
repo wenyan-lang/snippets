@@ -1,20 +1,49 @@
 {
   "name": "wenyan-snippets",
   "version": "0.0.1",
-  "description": "Snippets site for wenyan-lang",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "dev": "live-server static --entry-file=index.html",
-    "build": ""
+    "dev": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
   },
-  "keywords": [
-    "wenyan",
-    "wenyan-lang",
-    "snippets"
-  ],
-  "author": "",
-  "license": "MIT",
+  "dependencies": {
+    "core-js": "^3.6.4",
+    "nanoid": "^2.1.11",
+    "vue": "^2.6.11",
+    "vue-disqus": "^3.0.5",
+    "vuex": "^3.1.2",
+    "vuex-persistedstate": "^2.7.1"
+  },
   "devDependencies": {
-    "live-server": "^1.2.1"
-  }
+    "@vue/cli-plugin-babel": "~4.2.0",
+    "@vue/cli-plugin-eslint": "~4.2.0",
+    "@vue/cli-service": "~4.2.0",
+    "axios": "^0.19.2",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.1.2",
+    "stylus": "^0.54.7",
+    "stylus-loader": "^3.0.2",
+    "vue-router": "^3.1.5",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
 }

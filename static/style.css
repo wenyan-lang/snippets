@@ -1,8 +1,58 @@
 
-body{
+body, html {
   font-family: sans-serif;
-/*   filter: invert(1);background:black; */
+  margin: 0;
 }
+
+.nav {
+  padding: 5px;
+  background: #f1f1f1;
+  border-bottom: 1px solid gainsboro;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  white-space: nowrap;
+}
+
+.nav * {
+  vertical-align: middle;
+}
+
+.nav .iconify {
+  font-size: 1.5em;
+  margin: 0.3rem;
+  color: #444;
+  cursor: pointer;
+}
+
+.nav .right-aligned {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  padding: 5px;
+}
+
+.nav input {
+  margin: 0.5rem;
+  padding: 0.1rem 0.5rem;
+}
+
+.nav .title {
+  color: #777;
+  margin: 0.5rem 1rem;
+  font-size: 1.1em;
+}
+
+#content {
+  margin-top: 3.6rem;
+  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(18rem, 1fr));
+}
+
 .code-cell{
   margin: 5px;
   border-radius: 4px;
@@ -11,6 +61,7 @@ body{
   overflow: hidden;
   display: inline-block;
 }
+
 .code-header{
   color:grey;
   font-size: 12px;
@@ -83,9 +134,9 @@ body{
   margin: 5px;
 }
 .code-cell-inner{
-  width: 300px !important;
+  width: 100%;
   height: 128px !important;
-  overflow: scroll;
-  padding: 0px;
-  margin:0px;
+  overflow: hidden;
+  padding: 5px;
+  margin: 0px;
 }
