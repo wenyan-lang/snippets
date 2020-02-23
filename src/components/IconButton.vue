@@ -31,6 +31,6 @@ export default {
     color: #E53
 
   &[disabled]
-    opacity 0.5
+    opacity 0.7
     pointer-events none
 </style>

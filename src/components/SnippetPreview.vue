@@ -21,7 +21,7 @@
 
     <div class='right-aligned'>
       <icon-button @click.native="openComments" icon="comment-multiple-outline"/>
-      <icon-button :icon="permissionIcon"/>
+      <icon-button disabled :icon="permissionIcon"/>
     </div>
   </div>
 </div>

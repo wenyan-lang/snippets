@@ -213,6 +213,7 @@ export default {
     routed() {
       if (this.page === 0)
         this.fetchNext()
+      this.searchText = ''
     }
   }
 }
