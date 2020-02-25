@@ -43,7 +43,17 @@ export default {
       this.$refs.iframe.contentWindow.postMessage(data, '*')
     },
     async initSnapshot() {
-      if (this.snippet) {
+      if (this.$route.path === '/new' && !this.snippet) {
+        this.snapshot =  {
+          id: null,
+          token: this.userToken,
+          author: this.userName,
+          title: 'Untitled',
+          code: '',
+          ...this.$route.query,
+        }
+      } 
+      else if (this.snippet) {
         this.snapshot = { ...this.snippet }
       }
       else {
@@ -162,7 +172,8 @@ export default {
       }
     },
     async publish(data = this.snapshot) {
-      if (!confirm(`Publishing this script?\n\nTitle: ${data.title}\nAuthor: ${data.author}\nToken: ${data.token}`))
+      const result =confirm(`Publishing this script?\n\nTitle: ${data.title}\nAuthor: ${data.author}\nToken: ${data.token}`)
+      if (!result)
         return
       
       try {
@@ -252,7 +263,7 @@ export default {
       } catch (error) {
         this.$emit('notify', { error })
       }
-    }
+    },
   },
   computed: {
     public() {
@@ -312,7 +323,6 @@ export default {
           align: 'right'
         })
 
-
         if (!this.locked) {
           controls.push({
             id: 'delete',
@@ -354,6 +364,12 @@ export default {
   mounted() {
     this.registerListener()
     this.initEditor()
+
+    if (this.new && this.snapshot.action === 'publish') {
+      setTimeout(() => {
+        this.publish()
+      }, 3000)
+    }
   },
   destroyed() {
     this.unregisterListener()

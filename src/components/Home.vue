@@ -258,6 +258,9 @@ $max-width = 85rem
       max-width 100vw
       width 100%
 
+      .right-aligned
+        right 1.5rem
+
   .nav-inner
     max-width $max-width
     margin 0 auto
