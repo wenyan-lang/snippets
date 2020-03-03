@@ -5,7 +5,7 @@ http://snippets.wy-lang.org/
 
 ## API
 
-The base api url is https://wenyan-snippets.glitch.me
+The base api url is https://wys.glitch.me
 
 #### `GET /pages/:page`
 
