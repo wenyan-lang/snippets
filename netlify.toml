@@ -1,7 +1,0 @@
-[build]
-  publish = "static/"
-  command = "npm run build"
-
-[context.dev]
-  publish = "dist/"
-  command = "npm run build"
