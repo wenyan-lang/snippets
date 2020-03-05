@@ -290,12 +290,14 @@ export default {
       if (this.new) {
         controls.push({
           id: 'publish',
-          icon: 'cloud-upload'
+          icon: 'cloud-upload',
+          tooltip: 'Publish',
         })
       } else if (this.unsaved) {
         controls.push({
           id: 'save',
           icon: 'content-save',
+          tooltip: 'Save',
         })
       }
 
@@ -307,6 +309,11 @@ export default {
             : this.locked 
               ? 'lock-outline'
               : 'lock-open-variant-outline',
+          tooltip: this.public
+            ? 'Public'
+            : this.locked 
+              ? 'No access'
+              : 'Own by you',
           align: 'right',
           disabled: true,
         })
@@ -314,20 +321,23 @@ export default {
         controls.push({
           id: 'share',
           icon: 'link-variant',
-          align: 'right'
+          align: 'right',
+          tooltip: 'Share',
         })
         
         controls.push({
           id: 'fork',
           icon: 'source-fork',
-          align: 'right'
+          align: 'right',
+          tooltip: 'Fork',
         })
 
         if (!this.locked) {
           controls.push({
             id: 'delete',
             icon: 'delete-outline',
-            align: 'right'
+            align: 'right',
+            tooltip: 'Delete',
           })
         }
       }
@@ -336,13 +346,15 @@ export default {
         controls.push({
           id: 'open-in-editor',
           icon: 'open-in-new',
-          align: 'right'
+          align: 'right',
+          tooltip: 'Open in Editor',
         })
 
         controls.push({
           id: 'close',
           icon: 'close',
-          align: 'right'
+          align: 'right',
+          tooltip: 'Close',
         })
       }
 
