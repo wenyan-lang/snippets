@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "core-js": "^3.6.4",
-    "nanoid": "^2.1.11",
+    "nanoid": "^3.1.31",
     "vue": "^2.6.11",
     "vue-disqus": "^3.0.5",
     "vuex": "^3.1.2",
